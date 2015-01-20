@@ -2,8 +2,12 @@ package de.sopamo.uni.sleepminder;
 
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import de.sopamo.uni.sleepminder.detectors.AudioRecorder;
+import de.sopamo.uni.sleepminder.detectors.LightRecorder;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -11,7 +15,9 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        LightRecorder light = new LightRecorder();
+        Log.e("light",light.sensorExists(getApplicationContext())+"");
+        setContentView(new AudioView(this));
     }
 
 
