@@ -10,26 +10,70 @@ import android.util.Log;
 import de.sopamo.uni.sleepminder.AudioView;
 
 public class LightRecorder {
-    public boolean sensorExists(Context context) {
+
+    private Float currentLux = null;
+    private SensorEventListener sensorListener = null;
+
+    /**
+     * Start tracking the brightness
+     *
+     * @param context
+     * @return
+     */
+    public boolean start(Context context) {
+
+        // Get the light sensor
         SensorManager sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-        Sensor light =sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
+        Sensor light = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
+
+        // Check if we have a light sensor and if we do start tracking
         if(light != null) {
-            sensorManager.registerListener(new SensorEventListener() {
-                @Override
-                public void onSensorChanged(SensorEvent event) {
-                    float lux = event.values[0];
-                    AudioView.lux = lux;
-                }
+            sensorListener =
+                    new SensorEventListener() {
+                        @Override
+                        public void onSensorChanged(SensorEvent event) {
+                            LightRecorder.this.currentLux = event.values[0];
+                        }
 
-                @Override
-                public void onAccuracyChanged(Sensor sensor, int accuracy) {
+                        @Override
+                        public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
-                }
-            },light,SensorManager.SENSOR_DELAY_NORMAL);
+                        }
+                    };
+            sensorManager.registerListener(sensorListener,light,SensorManager.SENSOR_DELAY_NORMAL);
             return true;
         }
         else {
             return false;
         }
+    }
+
+    /**
+     * Returns the current lux
+     *
+     * @return
+     */
+    public Float getCurrentLux() {
+        return currentLux;
+    }
+
+    /**
+     * Stop listening for light changes
+     *
+     * @param context
+     */
+    public void stop(Context context) {
+
+        // Make sure we don't have any filled variables hanging around
+        this.currentLux = null;
+
+        // If we don't have a listener active we don't nee to unregister it
+        if(this.sensorListener == null) return;
+
+        // Unregister the listener
+        SensorManager sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+        sensorManager.unregisterListener(sensorListener);
+
+        this.sensorListener = null;
     }
 }

@@ -7,18 +7,19 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
-import android.util.Log;
 
-public class TrackingService extends Service {
+public class RecordingService extends Service {
 
     private final int ONGOING_NOTIFICATION_ID = 1;
+    private Recorder recorder;
 
-    public TrackingService() {
+    public RecordingService() {
+        recorder = new Recorder();
     }
 
     @Override
     public void onDestroy() {
-        // TODO: Stop tracking
+        recorder.stop(this);
     }
 
     @Override
@@ -28,9 +29,12 @@ public class TrackingService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.e("foo", "startForeground");
 
+        // Show the "we are tracking" notification
         startForeground(ONGOING_NOTIFICATION_ID, getNotification());
+
+        // Start the tracker
+        recorder.start(this);
 
         return START_STICKY;
     }
