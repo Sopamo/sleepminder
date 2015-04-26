@@ -1,11 +1,19 @@
 package de.sopamo.uni.sleepminder;
 
+import android.app.*;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+
+import java.io.File;
+
+import de.sopamo.uni.sleepminder.activities.NightsList;
+import de.sopamo.uni.sleepminder.activities.SingleNight;
+import de.sopamo.uni.sleepminder.storage.FileHandler;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -19,12 +27,35 @@ public class MainActivity extends ActionBarActivity {
 
         setContentView(R.layout.activity_main);
 
+
+        File[] files = FileHandler.listFiles();
+        for(int i = 0;i<files.length;i++) {
+            File file = files[i];
+            Log.e("foo", FileHandler.readFile(file));
+        }
+
         findViewById(R.id.showNotification).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Start the tracking service
                 Intent trackingIntent = new Intent(MainActivity.this, RecordingService.class);
                 MainActivity.this.startService(trackingIntent);
+
+                //MainActivity.this.startActivity(new Intent(MainActivity.this, SingleNight.class));
+            }
+        });
+
+        findViewById(R.id.showList).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MainActivity.this.startActivity(new Intent(MainActivity.this, NightsList.class));
+            }
+        });
+
+        findViewById(R.id.stopRecording).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                RecordingService.instance.stopSelf();
             }
         });
     }

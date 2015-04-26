@@ -11,15 +11,15 @@ import android.support.v4.app.TaskStackBuilder;
 public class RecordingService extends Service {
 
     private final int ONGOING_NOTIFICATION_ID = 1;
-    private Recorder recorder;
+    public static RecordingService instance;
 
     public RecordingService() {
-        recorder = new Recorder();
+        instance = this;
     }
 
     @Override
     public void onDestroy() {
-        recorder.stop(this);
+        Application.recorder.stop(Application.context);
     }
 
     @Override
@@ -34,7 +34,7 @@ public class RecordingService extends Service {
         startForeground(ONGOING_NOTIFICATION_ID, getNotification());
 
         // Start the tracker
-        recorder.start(this);
+        Application.recorder.start(Application.context);
 
         return START_STICKY;
     }

@@ -1,9 +1,9 @@
 package de.sopamo.uni.sleepminder;
 
 import android.content.Context;
-import android.util.Log;
 
 import de.sopamo.uni.sleepminder.detectors.LightRecorder;
+import de.sopamo.uni.sleepminder.storage.FileHandler;
 
 /**
  * This class is the interface for starting and stopping the tracker.
@@ -14,13 +14,14 @@ public class Recorder {
 
     private LightRecorder lightRecorder = null;
     private String data = "";
+    private String startTime = "";
 
     /**
      * Start tracking
      */
     public void start(Context context) {
         // Set the current timestamp to the data string
-        this.data = String.valueOf(System.currentTimeMillis() / 1000L);
+        this.data = this.startTime = String.valueOf(System.currentTimeMillis() / 1000L);
 
         lightRecorder = new LightRecorder();
         lightRecorder.start(context);
@@ -36,7 +37,6 @@ public class Recorder {
                         // We have to check if we already have a "current" lux. In the first call we might not have gotten a sensor change event.
                         if(lightRecorder.getCurrentLux() != null) {
                             data += " " + String.valueOf(lightRecorder.getCurrentLux().intValue());
-                            Log.e("foo", data);
                         }
                         customHandler.postDelayed(this, 5000);
                     }
@@ -53,10 +53,15 @@ public class Recorder {
     public void stop(Context context) {
         synchronized (this) {
             if (lightRecorder != null) {
+                // Stop all recorders
                 lightRecorder.stop(context);
                 // Cleanup
                 lightRecorder = null;
             }
+
+            // Write the data to a file
+            FileHandler.saveFile(data,"recording-" + startTime + ".txt");
+            startTime = "";
         }
     }
 }
