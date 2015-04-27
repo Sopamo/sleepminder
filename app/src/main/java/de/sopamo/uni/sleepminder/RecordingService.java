@@ -8,6 +8,8 @@ import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 
+import de.sopamo.uni.sleepminder.activities.MainActivity;
+
 public class RecordingService extends Service {
 
     private final int ONGOING_NOTIFICATION_ID = 1;

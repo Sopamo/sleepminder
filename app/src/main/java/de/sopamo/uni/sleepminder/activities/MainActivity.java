@@ -1,6 +1,5 @@
-package de.sopamo.uni.sleepminder;
+package de.sopamo.uni.sleepminder.activities;
 
-import android.app.*;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -11,8 +10,8 @@ import android.view.View;
 
 import java.io.File;
 
-import de.sopamo.uni.sleepminder.activities.NightsList;
-import de.sopamo.uni.sleepminder.activities.SingleNight;
+import de.sopamo.uni.sleepminder.R;
+import de.sopamo.uni.sleepminder.RecordingService;
 import de.sopamo.uni.sleepminder.storage.FileHandler;
 
 
@@ -56,13 +55,6 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 RecordingService.instance.stopSelf();
-            }
-        });
-
-        findViewById(R.id.showNight).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MainActivity.this.startActivity(new Intent(MainActivity.this, SingleNight.class));
             }
         });
     }

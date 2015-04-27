@@ -18,14 +18,19 @@ import de.sopamo.uni.sleepminder.R;
 import de.sopamo.uni.sleepminder.storage.FileHandler;
 
 public class SingleNight extends ActionBarActivity {
+
+    // Key for the filename
+    public static String EXTRA_FILE = "file";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.single_night);
+        setContentView(R.layout.activity_single_night);
 
-        File[] files = FileHandler.listFiles();
-        String content = FileHandler.readFile(files[files.length-1]);
-        Log.e("foo", content);
+        // Get the file we want to view from the given path
+        File file = new File(getIntent().getExtras().getString(EXTRA_FILE));
+
+        String content = FileHandler.readFile(file);
 
         String[] parts = content.split(" ");
         String start = parts[0];
