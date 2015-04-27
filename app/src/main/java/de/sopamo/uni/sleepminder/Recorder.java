@@ -38,6 +38,10 @@ public class Recorder {
                         if(lightRecorder.getCurrentLux() != null) {
                             data += " " + String.valueOf(lightRecorder.getCurrentLux().intValue());
                         }
+                        // Dump the data to the text file if we accumulated "enough"
+                        if(data.length() > 2000) {
+                            dumpData();
+                        }
                         customHandler.postDelayed(this, 5000);
                     }
                 }
@@ -60,8 +64,16 @@ public class Recorder {
             }
 
             // Write the data to a file
-            FileHandler.saveFile(data,"recording-" + startTime + ".txt");
+            dumpData();
             startTime = "";
         }
+    }
+
+    /**
+     * Dumps the currently accumulated data in the textfile
+     */
+    private void dumpData() {
+        FileHandler.saveFile(data,"recording-" + startTime + ".txt");
+        data = "";
     }
 }

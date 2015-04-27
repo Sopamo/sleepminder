@@ -23,7 +23,7 @@ public class FileHandler {
         FileOutputStream outputStream;
 
         try {
-            outputStream = Application.context.openFileOutput(filename, Context.MODE_PRIVATE);
+            outputStream = Application.context.openFileOutput(filename, Context.MODE_APPEND);
             outputStream.write(data.getBytes());
             outputStream.close();
         } catch (Exception e) {

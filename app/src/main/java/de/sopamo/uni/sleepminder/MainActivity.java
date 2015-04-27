@@ -58,6 +58,13 @@ public class MainActivity extends ActionBarActivity {
                 RecordingService.instance.stopSelf();
             }
         });
+
+        findViewById(R.id.showNight).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MainActivity.this.startActivity(new Intent(MainActivity.this, SingleNight.class));
+            }
+        });
     }
 
 
