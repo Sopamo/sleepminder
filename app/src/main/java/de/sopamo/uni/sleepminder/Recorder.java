@@ -43,6 +43,7 @@ public class Recorder {
             {
                 synchronized (Recorder.this) {
                     if (lightRecorder != null) {
+
                         // We have to check if we already have a "current" lux. In the first call we might not have gotten a sensor change event.
                         if(lightRecorder.getCurrentLux() != null) {
                             data += " " + String.valueOf(lightRecorder.getCurrentLux().intValue());
@@ -53,6 +54,7 @@ public class Recorder {
                         if(data.length() > 20) {
                             dumpData();
                         }
+
                         customHandler.postDelayed(this, 5000);
                     } else {
                         Log.e("foo","light recorder null");

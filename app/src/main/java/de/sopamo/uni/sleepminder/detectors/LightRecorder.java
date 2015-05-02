@@ -1,6 +1,9 @@
 package de.sopamo.uni.sleepminder.detectors;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -13,37 +16,75 @@ public class LightRecorder {
 
     private Float currentLux = null;
     private SensorEventListener sensorListener = null;
+    private Context context = null;
 
     /**
      * Start tracking the brightness
      *
      * @param context
-     * @return
+     * @return boolean if the sensor was registered correctly
      */
     public boolean start(Context context) {
+
+        this.context = context;
+
+        context.registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if(intent.getAction().equals(Intent.ACTION_SCREEN_OFF)){
+                    // Restart light tracking in 2 seconds
+                    new android.os.Handler().postDelayed(
+                        new Runnable() {
+                            public void run() {
+                                LightRecorder.this.registerSensorListener(LightRecorder.this.context);
+                            }
+                        },
+                        2000);
+
+                }
+            }
+        }, new IntentFilter(Intent.ACTION_SCREEN_OFF));
+
+        return registerSensorListener(context);
+    }
+
+    /**
+     * Registers a new light sensor listener
+     * Registers a new one if one is already active
+     *
+     * @param context
+     * @return
+     */
+    private boolean registerSensorListener(Context context) {
 
         // Get the light sensor
         SensorManager sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         Sensor light = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
 
-        // Check if we have a light sensor and if we do start tracking
         if(light != null) {
-            sensorListener =
-                    new SensorEventListener() {
-                        @Override
-                        public void onSensorChanged(SensorEvent event) {
-                            LightRecorder.this.currentLux = event.values[0];
-                        }
 
-                        @Override
-                        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+            // We already have an active sensorListener -> Remove it first and register a new one
+            if(sensorListener != null) {
+                sensorManager.unregisterListener(sensorListener);
+            }
 
-                        }
-                    };
-            sensorManager.registerListener(sensorListener,light,SensorManager.SENSOR_DELAY_NORMAL);
-            return true;
-        }
-        else {
+            // Create & register the sensor
+            sensorListener = new SensorEventListener() {
+                @Override
+                public void onSensorChanged(SensorEvent event) {
+                    LightRecorder.this.currentLux = event.values[0];
+                    Log.e("foo","new value " + event.values[0] );
+                }
+
+                @Override
+                public void onAccuracyChanged(Sensor sensor, int accuracy) {
+                    Log.e("foo","accuracy changed " + accuracy);
+
+                }
+            };
+            return sensorManager.registerListener(sensorListener, light, SensorManager.SENSOR_DELAY_NORMAL);
+
+        } else {
             return false;
         }
     }
