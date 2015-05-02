@@ -23,10 +23,10 @@ public class AudioRecorder extends Thread {
         try { // ... initialise
 
             if(N == 0) {
-                N = AudioRecord.getMinBufferSize(8000, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
+                N = AudioRecord.getMinBufferSize(16000, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
 
                 recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
-                        8000,
+                        16000,
                         AudioFormat.CHANNEL_IN_MONO,
                         AudioFormat.ENCODING_PCM_16BIT,
                         N * 10);
@@ -48,10 +48,16 @@ public class AudioRecorder extends Thread {
     }
 
     private void process(short[] buffer) {
-        for(short b: buffer) {
-            AudioView.instance.addPoint((double) (b/10));
-        }
+        AudioView.instance.addPoint(calculateRMS(buffer));
         AudioView.instance.invalidate();
+    }
+
+    private double calculateRMS(short[] buffer) {
+        long sum = 0;
+        for(int i=0;i<buffer.length;i++) {
+            sum += buffer[i] * buffer[i];
+        }
+        return Math.sqrt(sum/buffer.length);
     }
 
     public double mean(short[] m) {

@@ -10,8 +10,10 @@ import android.view.View;
 
 import java.io.File;
 
+import de.sopamo.uni.sleepminder.AudioView;
 import de.sopamo.uni.sleepminder.R;
 import de.sopamo.uni.sleepminder.RecordingService;
+import de.sopamo.uni.sleepminder.detectors.LightRecorder;
 import de.sopamo.uni.sleepminder.storage.FileHandler;
 
 
@@ -22,8 +24,9 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         /*LightRecorder light = new LightRecorder();
         Log.e("light", light.sensorExists(getApplicationContext()) + "");*/
-        //setContentView(new AudioView(this));
+        setContentView(new AudioView(this));
 
+        /*
         setContentView(R.layout.activity_main);
 
 
@@ -56,7 +59,7 @@ public class MainActivity extends ActionBarActivity {
             public void onClick(View v) {
                 RecordingService.instance.stopSelf();
             }
-        });
+        });*/
     }
 
 
