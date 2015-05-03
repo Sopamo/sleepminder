@@ -49,7 +49,7 @@ public class AudioRecorder extends Thread {
 
     private void process(short[] buffer) {
         AudioView.instance.addPoint(calculateRMS(buffer));
-        AudioView.instance.addPoint2(calculateHighFreqRMS(buffer));
+        AudioView.instance.addPoint2(calculateRLH(buffer));
         AudioView.instance.invalidate();
     }
 
@@ -61,6 +61,20 @@ public class AudioRecorder extends Thread {
         return Math.sqrt(sum/buffer.length);
     }
 
+    private double calculateLowFreqRMS(short[] buffer) {
+        short[] lowFreq = new short[buffer.length];
+
+        lowFreq[0] = 0;
+
+        float a = 0.25f;
+
+        for(int i=1;i<buffer.length;i++) {
+            lowFreq[i] = (short)(lowFreq[i-1] + a * (buffer[i] - lowFreq[i-1]));
+        }
+
+        return calculateRMS(lowFreq);
+    }
+
     private double calculateHighFreqRMS(short[] buffer) {
         short[] highFreq = new short[buffer.length];
 
@@ -69,18 +83,14 @@ public class AudioRecorder extends Thread {
         float a = 0.25f;
 
         for(int i=1;i<buffer.length;i++) {
-            highFreq[i] = (short)(highFreq[i-1] + a * (buffer[i] - highFreq[i-1]));
+            highFreq[i] = (short)(a * (highFreq[i-1] + buffer[i] - buffer[i-1]));
         }
 
         return calculateRMS(highFreq);
     }
 
-    public double mean(short[] m) {
-        double sum = 0;
-        for (short aM : m) {
-            sum += aM;
-        }
-        return sum / m.length;
+    private double calculateRLH(short[] buffer) {
+        return calculateLowFreqRMS(buffer) / calculateHighFreqRMS(buffer);
     }
 
     private void close() {
