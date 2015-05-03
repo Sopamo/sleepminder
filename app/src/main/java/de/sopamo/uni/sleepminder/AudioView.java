@@ -16,6 +16,7 @@ import de.sopamo.uni.sleepminder.detectors.AudioRecorder;
 public class AudioView extends View {
     Paint paint;
     ArrayList<Double> points = null;
+    ArrayList<Double> points2 = null;
     public static AudioView instance = null;
     public static float lux = 0;
 
@@ -42,6 +43,7 @@ public class AudioView extends View {
         paint.setStyle(Paint.Style.FILL);
         paint.setTextSize(80);
         points = new ArrayList<>();
+        points2 = new ArrayList<>();
         instance = this;
 
         AudioRecorder recorder = new AudioRecorder();
@@ -55,12 +57,23 @@ public class AudioView extends View {
         points.add(point);
     }
 
+    public void addPoint2(Double point) {
+        if(points2.size() > 500) {
+            points2.remove(0);
+        }
+        points2.add(point);
+    }
+
     @Override
     protected void onDraw(Canvas canvas) {
         // TODO Auto-generated method stub
         super.onDraw(canvas);
         for(int i = 0;i<points.size();i++) {
             canvas.drawCircle(100+i*2, (int)(points.get(i)+600), 2, paint);
+        }
+
+        for(int i = 0;i<points2.size();i++) {
+            canvas.drawCircle(100+i*2, (int)(points2.get(i)+1200), 2, paint);
         }
 
         canvas.drawText("Lux: " + lux,100f,200f,paint);

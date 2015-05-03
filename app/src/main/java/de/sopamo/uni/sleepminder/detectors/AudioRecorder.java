@@ -49,15 +49,30 @@ public class AudioRecorder extends Thread {
 
     private void process(short[] buffer) {
         AudioView.instance.addPoint(calculateRMS(buffer));
+        AudioView.instance.addPoint2(calculateHighFreqRMS(buffer));
         AudioView.instance.invalidate();
     }
 
     private double calculateRMS(short[] buffer) {
         long sum = 0;
         for(int i=0;i<buffer.length;i++) {
-            sum += buffer[i] * buffer[i];
+            sum += Math.pow(buffer[i],2);
         }
         return Math.sqrt(sum/buffer.length);
+    }
+
+    private double calculateHighFreqRMS(short[] buffer) {
+        short[] highFreq = new short[buffer.length];
+
+        highFreq[0] = 0;
+
+        float a = 0.25f;
+
+        for(int i=1;i<buffer.length;i++) {
+            highFreq[i] = (short)(highFreq[i-1] + a * (buffer[i] - highFreq[i-1]));
+        }
+
+        return calculateRMS(highFreq);
     }
 
     public double mean(short[] m) {
