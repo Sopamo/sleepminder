@@ -6,7 +6,7 @@ import android.util.Log;
 
 import java.io.File;
 
-import de.sopamo.uni.sleepminder.detectors.LightRecorder;
+import de.sopamo.uni.sleepminder.recorders.LightRecorder;
 import de.sopamo.uni.sleepminder.storage.FileHandler;
 
 /**
@@ -92,7 +92,7 @@ public class Recorder {
     private void dumpData() {
         FileHandler.saveFile(data,"recording-" + startTime + ".txt");
         Log.e("foo", "dumped data");
-        File file = new File(Application.context.getFilesDir() + "/recording-" + startTime + ".txt");
+        File file = new File(MyApplication.context.getFilesDir() + "/recording-" + startTime + ".txt");
         String content = FileHandler.readFile(file);
         Log.e("foo", content);
         data = "";

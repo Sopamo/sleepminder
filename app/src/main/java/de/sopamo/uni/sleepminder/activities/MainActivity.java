@@ -10,10 +10,8 @@ import android.view.View;
 
 import java.io.File;
 
-import de.sopamo.uni.sleepminder.AudioView;
 import de.sopamo.uni.sleepminder.R;
 import de.sopamo.uni.sleepminder.RecordingService;
-import de.sopamo.uni.sleepminder.detectors.LightRecorder;
 import de.sopamo.uni.sleepminder.storage.FileHandler;
 
 

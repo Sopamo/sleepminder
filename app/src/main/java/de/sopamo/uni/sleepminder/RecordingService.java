@@ -21,7 +21,7 @@ public class RecordingService extends Service {
 
     @Override
     public void onDestroy() {
-        Application.recorder.stop(Application.context);
+        MyApplication.recorder.stop(MyApplication.context);
     }
 
     @Override
@@ -36,7 +36,7 @@ public class RecordingService extends Service {
         startForeground(ONGOING_NOTIFICATION_ID, getNotification());
 
         // Start the tracker
-        Application.recorder.start(Application.context);
+        MyApplication.recorder.start(MyApplication.context);
 
         return START_STICKY;
     }

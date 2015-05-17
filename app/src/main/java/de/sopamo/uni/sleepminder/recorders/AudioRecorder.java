@@ -1,13 +1,13 @@
-package de.sopamo.uni.sleepminder.detectors;
+package de.sopamo.uni.sleepminder.recorders;
 
+import android.app.Application;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.util.Log;
 
-import java.util.Arrays;
-
 import de.sopamo.uni.sleepminder.AudioView;
+import de.sopamo.uni.sleepminder.MyApplication;
 
 public class AudioRecorder extends Thread {
     private boolean stopped = false;
@@ -44,12 +44,18 @@ public class AudioRecorder extends Thread {
         } finally {
             close();
         }
-        Log.e("record","done");
+        Log.e("record", "done");
     }
 
     private void process(short[] buffer) {
-        AudioView.instance.addPoint(calculateRMS(buffer));
-        AudioView.instance.addPoint2(calculateRLH(buffer));
+        //AudioView.instance.addPoint(calculateRMS(buffer));
+
+        MyApplication.noiseModel.addRLH(calculateRLH(buffer));
+        MyApplication.noiseModel.addRMS(calculateRMS(buffer));
+        MyApplication.noiseModel.addVAR(calculateVar(buffer));
+
+        AudioView.instance.addPoint2(MyApplication.noiseModel.getNormalizedRLH(),MyApplication.noiseModel.getNormalizedVAR());
+        AudioView.lux = (float)(MyApplication.noiseModel.getNormalizedRMS());
         AudioView.instance.invalidate();
     }
 
@@ -58,7 +64,7 @@ public class AudioRecorder extends Thread {
         for(int i=0;i<buffer.length;i++) {
             sum += Math.pow(buffer[i],2);
         }
-        return Math.sqrt(sum/buffer.length);
+        return Math.sqrt(sum / buffer.length);
     }
 
     private double calculateLowFreqRMS(short[] buffer) {
@@ -90,7 +96,41 @@ public class AudioRecorder extends Thread {
     }
 
     private double calculateRLH(short[] buffer) {
-        return calculateLowFreqRMS(buffer) / calculateHighFreqRMS(buffer);
+        double rmsh = calculateHighFreqRMS(buffer);
+        double rmsl = calculateLowFreqRMS(buffer);
+        if(rmsh == 0) return 0;
+        if(rmsl == 0) return 0;
+        return  rmsl / rmsh;
+    }
+
+    /**
+     * Calculates the var of one frame
+     *
+     * @param buffer
+     * @return
+     */
+    private double calculateVar(short[] buffer) {
+
+        double mean = calculateMean(buffer);
+        double var = 0;
+        for(short s: buffer) {
+            var += Math.pow(s - mean,2);
+        }
+        return var / buffer.length;
+    }
+
+    /**
+     * Calculate the mean of one fram
+     *
+     * @param buffer
+     * @return
+     */
+    private double calculateMean(short[] buffer) {
+        double mean = 0;
+        for(short s: buffer) {
+            mean += s;
+        }
+        return mean / buffer.length;
     }
 
     private void close() {

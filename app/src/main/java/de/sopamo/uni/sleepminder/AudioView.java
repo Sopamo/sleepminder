@@ -4,19 +4,17 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Path;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 
 import java.util.ArrayList;
 
-import de.sopamo.uni.sleepminder.detectors.AudioRecorder;
+import de.sopamo.uni.sleepminder.recorders.AudioRecorder;
 
 public class AudioView extends View {
     Paint paint;
     ArrayList<Double> points = null;
-    ArrayList<Double> points2 = null;
+    ArrayList<Double[]> points2 = null;
     public static AudioView instance = null;
     public static float lux = 0;
 
@@ -57,27 +55,34 @@ public class AudioView extends View {
         points.add(point);
     }
 
-    public void addPoint2(Double point) {
-        if(points2.size() > 500) {
+    public void addPoint2(Double x, Double y) {
+        if(points2.size() > 100) {
             points2.remove(0);
         }
-        points2.add(point);
+        Double[] p = new Double[2];
+        p[0] = x;
+        p[1] = y;
+        points2.add(p);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         // TODO Auto-generated method stub
         super.onDraw(canvas);
-        for(int i = 0;i<points.size();i++) {
-            canvas.drawCircle(100+i*2, (int)(points.get(i)+600), 2, paint);
-        }
+        //for(int i = 0;i<points.size();i++) {
+            //canvas.drawCircle(100+i*2, (int)(points.get(i)+600), 2, paint);
+        //}
 
         for(int i = 0;i<points2.size();i++) {
-            canvas.drawCircle(100+i*2, (int)(points2.get(i)+1200), 2, paint);
+            Double[] p = points2.get(i);
+            canvas.drawCircle((float)(500 + p[0]*100),(float)(500+p[1]*100), 2, paint);
         }
-
-        canvas.drawText("Lux: " + lux,100f,200f,paint);
-
+        if(points2.size() > 0) {
+            Double[] curr = points2.get(points2.size() - 1);
+            canvas.drawText("RLH: " + curr[0]*100, 100f, 200f, paint);
+            canvas.drawText("VAR: " + curr[1]*100, 100f, 300f, paint);
+            canvas.drawText("RMS: " + lux, 100f, 400f, paint);
+        }
 
         AudioRecorder recorder = new AudioRecorder();
         recorder.run();

@@ -7,9 +7,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 
-import de.sopamo.uni.sleepminder.Application;
+import de.sopamo.uni.sleepminder.MyApplication;
 
 public class FileHandler {
 
@@ -23,7 +22,7 @@ public class FileHandler {
         FileOutputStream outputStream;
 
         try {
-            outputStream = Application.context.openFileOutput(filename, Context.MODE_APPEND);
+            outputStream = MyApplication.context.openFileOutput(filename, Context.MODE_APPEND);
             outputStream.write(data.getBytes());
             outputStream.close();
         } catch (Exception e) {
@@ -56,7 +55,7 @@ public class FileHandler {
      * @return The list of internal storage files
      */
     public static File[] listFiles() {
-        File internalFiles = Application.context.getFilesDir();
+        File internalFiles = MyApplication.context.getFilesDir();
         return internalFiles.listFiles();
     }
 }

@@ -1,4 +1,4 @@
-package de.sopamo.uni.sleepminder.detectors;
+package de.sopamo.uni.sleepminder.recorders;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -9,8 +9,6 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.util.Log;
-
-import de.sopamo.uni.sleepminder.AudioView;
 
 public class LightRecorder {
 
