@@ -3,9 +3,11 @@ package de.sopamo.uni.sleepminder;
 import android.content.Context;
 import android.os.PowerManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.File;
 
+import de.sopamo.uni.sleepminder.recorders.AudioRecorder;
 import de.sopamo.uni.sleepminder.recorders.LightRecorder;
 import de.sopamo.uni.sleepminder.storage.FileHandler;
 
@@ -17,6 +19,7 @@ import de.sopamo.uni.sleepminder.storage.FileHandler;
 public class Recorder {
 
     private LightRecorder lightRecorder = null;
+    private AudioRecorder audioRecorder = null;
     private String data = "";
     private String startTime = "";
     private PowerManager.WakeLock wakeLock;
@@ -27,9 +30,13 @@ public class Recorder {
     public void start(Context context) {
         // Set the current timestamp to the data string
         this.data = this.startTime = String.valueOf(System.currentTimeMillis() / 1000L);
+        this.data += ";";
 
         lightRecorder = new LightRecorder();
         lightRecorder.start(context);
+
+        audioRecorder = new AudioRecorder();
+        audioRecorder.run();
 
         PowerManager mgr = (PowerManager)context.getSystemService(Context.POWER_SERVICE);
         wakeLock = mgr.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MyWakeLock");
@@ -46,12 +53,22 @@ public class Recorder {
 
                         // We have to check if we already have a "current" lux. In the first call we might not have gotten a sensor change event.
                         if(lightRecorder.getCurrentLux() != null) {
-                            data += " " + String.valueOf(lightRecorder.getCurrentLux().intValue());
+                            data += String.valueOf(lightRecorder.getCurrentLux().intValue());
                         } else {
+                            data += "-1";
                             Log.e("foo","current lux null");
                         }
+                        if(MyApplication.noiseModel != null) {
+                            data += " " + String.valueOf(MyApplication.noiseModel.getEvent());
+                        } else {
+                            data += " " + "-1";
+                            Log.e("foo","Noise model not initiated");
+                            Toast toast = Toast.makeText(MyApplication.context, "Noise model not initiated", Toast.LENGTH_LONG);
+                            toast.show();
+                        }
+                        data += ";";
                         // Dump the data to the text file if we accumulated "enough"
-                        if(data.length() > 20) {
+                        if(data.length() > 200) {
                             dumpData();
                         }
 

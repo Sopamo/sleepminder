@@ -5,7 +5,7 @@
     tools:context=".MainActivity">
 
 
-    <RelativeLayout xmlns:materialdesign="http://schemas.android.com/apk/res-auto"
+    <RelativeLayout
         android:id="@+id/relativeLayout"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -25,17 +25,14 @@
             android:textColor="@android:color/white"
             android:textSize="40sp" />
 
-        <com.gc.materialdesign.views.ButtonFloat
+        <Button
             android:id="@+id/showNotification"
             android:layout_width="10dp"
             android:layout_height="10dp"
-            android:layout_alignParentBottom="true"
             android:layout_below="@+id/title"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="20dp"
-            android:background="#1E88E5"
-            materialdesign:animate="true"
-            materialdesign:iconDrawable="@drawable/ic_action_play" />
+            android:background="#1E88E5"/>
     </RelativeLayout>
 
 

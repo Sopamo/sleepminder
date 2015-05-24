@@ -8,6 +8,9 @@ public class NoiseModel {
     private List<Double> RLH;
     private List<Double> VAR;
 
+    private int snore = 0;
+    private int movement = 0;
+
     public NoiseModel() {
         RMS = new ArrayList<>();
         RLH = new ArrayList<>();
@@ -51,6 +54,21 @@ public class NoiseModel {
         return (VAR.get(VAR.size()-1) - mean(VAR)) / std(VAR);
     }
 
+    /**
+     * This detects which event occured in the current frame
+     */
+    public void calculateFrame() {
+        if(getNormalizedVAR() > 1) { // Filter noise
+            if(getNormalizedRLH() > 2) {
+                snore++;
+            } else {
+                if(getNormalizedRMS() > 0.5) {
+                    movement++;
+                }
+            }
+        }
+    }
+
     private double mean(List<Double> list) {
         double sum = 0;
         for (int i = 0; i < list.size(); i++) {
@@ -66,6 +84,17 @@ public class NoiseModel {
             var += Math.pow(list.get(i) - mean,2);
         }
         return Math.sqrt(var / list.size());
+    }
+
+    public int getEvent() {
+        if(snore < 1 && movement < 2) {
+            return 0;
+        }
+        if(snore * 2 > movement) {
+            return 1;
+        } else {
+            return 2;
+        }
     }
 
 }

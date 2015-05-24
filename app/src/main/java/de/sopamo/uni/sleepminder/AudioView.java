@@ -24,6 +24,8 @@ public class AudioView extends View {
     ArrayList<Double> var = null;
     ArrayList<Double> rms = null;
 
+    private AudioRecorder recorder;
+
     public AudioView(Context context) {
         super(context);
         init();
@@ -53,7 +55,7 @@ public class AudioView extends View {
         rms = new ArrayList<>();
         instance = this;
 
-        AudioRecorder recorder = new AudioRecorder();
+        recorder = new AudioRecorder();
         recorder.run();
     }
 
@@ -110,7 +112,7 @@ public class AudioView extends View {
             canvas.drawText("RLH: " + curr[0], 100f, 200f, paint);
             canvas.drawText("VAR: " + curr[1], 100f, 300f, paint);
             canvas.drawText("RMS: " + lux, 100f, 400f, paint);
-            if(curr[1] > 1) {
+            if(curr[1] > 1) { // Filter noise
                 if(curr[0] > 2) {
                     snore++;
                 } else {
@@ -126,7 +128,7 @@ public class AudioView extends View {
             addRMS((double) (lux * 20 + 900));
             drawPoints(canvas);
         }
-
+        recorder.close();
         AudioRecorder recorder = new AudioRecorder();
         recorder.run();
         this.i++;

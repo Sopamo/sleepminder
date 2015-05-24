@@ -32,12 +32,13 @@ public class SingleNight extends ActionBarActivity {
 
         String content = FileHandler.readFile(file);
 
-        String[] parts = content.split(" ");
+        String[] parts = content.split(";");
         String start = parts[0];
 
         LineChart chart = (LineChart)findViewById(R.id.chart);
 
         ArrayList<Entry> valsComp1 = new ArrayList<Entry>();
+        ArrayList<Entry> valsComp2 = new ArrayList<Entry>();
 
         ArrayList<String> xVals = new ArrayList<String>();
 
@@ -47,17 +48,22 @@ public class SingleNight extends ActionBarActivity {
             if(parts[i-1].equals(parts[i])) {
                 continue;
             }
-            addPoint(parts[i-1],i-1,j,start,xVals,valsComp1);
+            String[] values = parts[i-1].split(" ");
+            addPoint(values[0],i-1,j,start,xVals,valsComp1);
+            addPoint2(values[1], i - 1, j, start, xVals, valsComp2);
             j++;
-            addPoint(parts[i],i,j,start,xVals,valsComp1);
+            values = parts[i].split(" ");
+            addPoint(values[0],i,j,start,xVals,valsComp1);
+            addPoint2(values[1],i,j,start,xVals,valsComp1);
             j++;
-
         }
 
-        LineDataSet setComp1 = new LineDataSet(valsComp1, "Company 1");
+        LineDataSet setComp1 = new LineDataSet(valsComp1, "Light");
+        LineDataSet setComp2 = new LineDataSet(valsComp1, "Event");
 
         ArrayList<LineDataSet> dataSets = new ArrayList<LineDataSet>();
         dataSets.add(setComp1);
+        dataSets.add(setComp2);
 
         LineData data = new LineData(xVals, dataSets);
         chart.setData(data);
@@ -70,7 +76,10 @@ public class SingleNight extends ActionBarActivity {
         valsComp1.add(c1e1);
         long dv = (Long.valueOf(start) + 5 * timeshift) * 1000;
         Date df = new java.util.Date(dv);
-        Log.e("foo",new SimpleDateFormat("HH:mm").format(df));
         xVals.add(new SimpleDateFormat("HH:mm").format(df));
+    }
+    private void addPoint2(String point, int timeshift, int position, String start, ArrayList<String> xVals, ArrayList<Entry> valsComp2) {
+        Entry c1e1 = new Entry(Float.parseFloat(point), position);
+        valsComp2.add(c1e1);
     }
 }

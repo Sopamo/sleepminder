@@ -43,20 +43,22 @@ public class AudioRecorder extends Thread {
             close();
         }
         Log.e("record", "done");
+        if(!stopped) {
+            this.run();
+        }
     }
 
     private void process(short[] buffer) {
-        //AudioView.instance.addPoint(calculateRMS(buffer));
 
         MyApplication.noiseModel.addRLH(calculateRLH(buffer));
         MyApplication.noiseModel.addRMS(calculateRMS(buffer));
         MyApplication.noiseModel.addVAR(calculateVar(buffer));
-        Log.e("variance", calculateVar(buffer)+"");
 
-        AudioView.instance.addPoint2(MyApplication.noiseModel.getNormalizedRLH(), MyApplication.noiseModel.getNormalizedVAR());
-        //AudioView.instance.addPoint2(calculateLowFreqRMS(buffer),calculateHighFreqRMS(buffer));
-        AudioView.lux = (float)(MyApplication.noiseModel.getNormalizedRMS());
-        AudioView.instance.invalidate();
+        MyApplication.noiseModel.calculateFrame();
+
+        //AudioView.instance.addPoint2(MyApplication.noiseModel.getNormalizedRLH(), MyApplication.noiseModel.getNormalizedVAR());
+        //AudioView.lux = (float)(MyApplication.noiseModel.getNormalizedRMS());
+        //AudioView.instance.invalidate();
     }
 
     private double calculateRMS(short[] buffer) {
@@ -141,7 +143,7 @@ public class AudioRecorder extends Thread {
         return mean / buffer.length;
     }
 
-    private void close() {
+    public void close() {
         stopped = true;
     }
 
