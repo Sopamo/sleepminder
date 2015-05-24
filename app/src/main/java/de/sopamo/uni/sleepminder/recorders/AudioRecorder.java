@@ -17,26 +17,24 @@ public class AudioRecorder extends Thread {
     @Override
     public void run() {
         android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
-        short[][]   buffers  = new short[256][160];
-        int         ix       = 0;
+        short[]   buffer  = new short[1600];
 
         try { // ... initialise
-
             if(N == 0) {
                 N = AudioRecord.getMinBufferSize(16000, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
-
+                if(N < 1600) {
+                    N = 1600;
+                }
+                Log.e("foo",N+"");
                 recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
                         16000,
                         AudioFormat.CHANNEL_IN_MONO,
                         AudioFormat.ENCODING_PCM_16BIT,
-                        N * 10);
+                        N);
             }
             recorder.startRecording();
 
-            short[] buffer = buffers[ix++ % buffers.length];
-
             N = recorder.read(buffer, 0, buffer.length);
-
             process(buffer);
             recorder.stop();
         } catch(Throwable x) {
@@ -53,8 +51,10 @@ public class AudioRecorder extends Thread {
         MyApplication.noiseModel.addRLH(calculateRLH(buffer));
         MyApplication.noiseModel.addRMS(calculateRMS(buffer));
         MyApplication.noiseModel.addVAR(calculateVar(buffer));
+        Log.e("variance", calculateVar(buffer)+"");
 
-        AudioView.instance.addPoint2(MyApplication.noiseModel.getNormalizedRLH(),MyApplication.noiseModel.getNormalizedVAR());
+        AudioView.instance.addPoint2(MyApplication.noiseModel.getNormalizedRLH(), MyApplication.noiseModel.getNormalizedVAR());
+        //AudioView.instance.addPoint2(calculateLowFreqRMS(buffer),calculateHighFreqRMS(buffer));
         AudioView.lux = (float)(MyApplication.noiseModel.getNormalizedRMS());
         AudioView.instance.invalidate();
     }
@@ -67,29 +67,37 @@ public class AudioRecorder extends Thread {
         return Math.sqrt(sum / buffer.length);
     }
 
+    private double calculateRMS(float[] buffer) {
+        long sum = 0;
+        for(int i=0;i<buffer.length;i++) {
+            sum += Math.pow(buffer[i],2);
+        }
+        return Math.sqrt(sum / buffer.length);
+    }
+
     private double calculateLowFreqRMS(short[] buffer) {
-        short[] lowFreq = new short[buffer.length];
+        float[] lowFreq = new float[buffer.length];
 
         lowFreq[0] = 0;
 
         float a = 0.25f;
 
         for(int i=1;i<buffer.length;i++) {
-            lowFreq[i] = (short)(lowFreq[i-1] + a * (buffer[i] - lowFreq[i-1]));
+            lowFreq[i] = lowFreq[i-1] + a * (buffer[i] - lowFreq[i-1]);
         }
 
-        return calculateRMS(lowFreq);
+        return calculateRMS(buffer);
     }
 
     private double calculateHighFreqRMS(short[] buffer) {
-        short[] highFreq = new short[buffer.length];
+        float[] highFreq = new float[buffer.length];
 
         highFreq[0] = 0;
 
         float a = 0.25f;
 
         for(int i=1;i<buffer.length;i++) {
-            highFreq[i] = (short)(a * (highFreq[i-1] + buffer[i] - buffer[i-1]));
+            highFreq[i] = a * (highFreq[i-1] + buffer[i] - buffer[i-1]);
         }
 
         return calculateRMS(highFreq);

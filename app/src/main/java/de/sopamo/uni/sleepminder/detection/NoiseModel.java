@@ -15,19 +15,19 @@ public class NoiseModel {
     }
 
     public void addRMS(Double rms) {
-        if(RMS.size() >= 40) {
+        if(RMS.size() >= 10) {
             RMS.remove(0);
         }
         RMS.add(rms);
     }
     public void addRLH(Double rlh) {
-        if(RLH.size() >= 40) {
+        if(RLH.size() >= 10) {
             RLH.remove(0);
         }
         RLH.add(rlh);
     }
     public void addVAR(Double var) {
-        if(VAR.size() >= 40) {
+        if(VAR.size() >= 100) {
             VAR.remove(0);
         }
         VAR.add(var);
