@@ -71,12 +71,10 @@ public class LightRecorder {
                 @Override
                 public void onSensorChanged(SensorEvent event) {
                     LightRecorder.this.currentLux = event.values[0];
-                    Log.e("foo","new value " + event.values[0] );
                 }
 
                 @Override
                 public void onAccuracyChanged(Sensor sensor, int accuracy) {
-                    Log.e("foo","accuracy changed " + accuracy);
 
                 }
             };

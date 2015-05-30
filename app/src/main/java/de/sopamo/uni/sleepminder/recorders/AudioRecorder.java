@@ -25,7 +25,6 @@ public class AudioRecorder extends Thread {
                 if(N < 1600) {
                     N = 1600;
                 }
-                Log.e("foo",N+"");
                 recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
                         16000,
                         AudioFormat.CHANNEL_IN_MONO,

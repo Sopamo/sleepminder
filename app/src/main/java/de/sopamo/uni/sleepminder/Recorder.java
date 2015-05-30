@@ -68,7 +68,7 @@ public class Recorder {
                         }
                         data += ";";
                         // Dump the data to the text file if we accumulated "enough"
-                        if(data.length() > 200) {
+                        if(data.length() > 20) {
                             dumpData();
                         }
 

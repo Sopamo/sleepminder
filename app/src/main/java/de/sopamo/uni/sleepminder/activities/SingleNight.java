@@ -54,12 +54,15 @@ public class SingleNight extends ActionBarActivity {
             j++;
             values = parts[i].split(" ");
             addPoint(values[0],i,j,start,xVals,valsComp1);
-            addPoint2(values[1],i,j,start,xVals,valsComp1);
+            addPoint2(values[1],i,j,start,xVals,valsComp2);
             j++;
         }
 
+        Log.e("fooval",valsComp1.size()+"");
+        Log.e("foox",xVals.size()+"");
+
         LineDataSet setComp1 = new LineDataSet(valsComp1, "Light");
-        LineDataSet setComp2 = new LineDataSet(valsComp1, "Event");
+        LineDataSet setComp2 = new LineDataSet(valsComp2, "Event");
 
         ArrayList<LineDataSet> dataSets = new ArrayList<LineDataSet>();
         dataSets.add(setComp1);
