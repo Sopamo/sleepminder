@@ -55,9 +55,9 @@ public class AudioRecorder extends Thread {
 
         MyApplication.noiseModel.calculateFrame();
 
-        //AudioView.instance.addPoint2(MyApplication.noiseModel.getNormalizedRLH(), MyApplication.noiseModel.getNormalizedVAR());
-        //AudioView.lux = (float)(MyApplication.noiseModel.getNormalizedRMS());
-        //AudioView.instance.invalidate();
+        AudioView.instance.addPoint2(MyApplication.noiseModel.getNormalizedRLH(), MyApplication.noiseModel.getNormalizedVAR());
+        AudioView.lux = (float)(MyApplication.noiseModel.getNormalizedRMS());
+        AudioView.instance.invalidate();
     }
 
     private double calculateRMS(short[] buffer) {

@@ -23,11 +23,14 @@ public class Recorder {
     private String data = "";
     private String startTime = "";
     private PowerManager.WakeLock wakeLock;
+    private boolean running = false;
 
     /**
      * Start tracking
      */
     public void start(Context context) {
+        running = true;
+
         // Set the current timestamp to the data string
         this.data = this.startTime = String.valueOf(System.currentTimeMillis() / 1000L);
         this.data += ";";
@@ -39,7 +42,7 @@ public class Recorder {
         audioRecorder.run();
 
         PowerManager mgr = (PowerManager)context.getSystemService(Context.POWER_SERVICE);
-        wakeLock = mgr.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MyWakeLock");
+        wakeLock = mgr.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "SleepMinderLock");
         wakeLock.acquire();
 
         // Add the lux information every 5 seconds
@@ -100,7 +103,12 @@ public class Recorder {
             // Write the data to a file
             dumpData();
             startTime = "";
+            running = false;
         }
+    }
+
+    public boolean isRunning() {
+        return running;
     }
 
     /**
@@ -108,10 +116,6 @@ public class Recorder {
      */
     private void dumpData() {
         FileHandler.saveFile(data,"recording-" + startTime + ".txt");
-        Log.e("foo", "dumped data");
-        File file = new File(MyApplication.context.getFilesDir() + "/recording-" + startTime + ".txt");
-        String content = FileHandler.readFile(file);
-        Log.e("foo", content);
         data = "";
     }
 }
