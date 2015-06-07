@@ -1,5 +1,6 @@
 package de.sopamo.uni.sleepminder.activities;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -45,16 +46,16 @@ public class SingleNight extends ActionBarActivity {
         int j = 0;
 
         for(int i = 2;i<parts.length;i++) {
-            if(parts[i-1].equals(parts[i])) {
+            /*if(parts[i-1].equals(parts[i])) {
                 continue;
             }
             String[] values = parts[i-1].split(" ");
             addPoint(values[0],i-1,j,start,xVals,valsComp1);
             addPoint2(values[1], i - 1, j, start, xVals, valsComp2);
-            j++;
-            values = parts[i].split(" ");
+            j++;*/
+            String[] values = parts[i].split(" ");
             addPoint(values[0],i,j,start,xVals,valsComp1);
-            addPoint2(values[1],i,j,start,xVals,valsComp2);
+            addPoint2(values[1], i, j, start, xVals, valsComp2);
             j++;
         }
 
@@ -63,6 +64,7 @@ public class SingleNight extends ActionBarActivity {
 
         LineDataSet setComp1 = new LineDataSet(valsComp1, "Light");
         LineDataSet setComp2 = new LineDataSet(valsComp2, "Event");
+        setComp2.setCircleColor(Color.RED);
 
         ArrayList<LineDataSet> dataSets = new ArrayList<LineDataSet>();
         dataSets.add(setComp1);

@@ -1,5 +1,7 @@
 package de.sopamo.uni.sleepminder.detection;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,20 +39,19 @@ public class NoiseModel {
     }
 
     public double getNormalizedRMS() {
-        if(RMS.size() == 0) return 0d;
+        if(RMS.size() <= 1) return 0d;
 
         return (RMS.get(RMS.size()-1) - mean(RMS)) / std(RMS);
     }
 
     public double getNormalizedRLH() {
-        if(RLH.size() == 0) return 0d;
+        if(RLH.size() <= 1) return 0d;
 
         return (RLH.get(RLH.size()-1) - mean(RLH)) / std(RLH);
     }
 
     public double getNormalizedVAR() {
-        if(VAR.size() == 0) return 0d;
-
+        if(VAR.size() <= 1) return 0d;
         return (VAR.get(VAR.size()-1) - mean(VAR)) / std(VAR);
     }
 

@@ -56,7 +56,7 @@ public class AudioView extends View {
         instance = this;
 
         recorder = new AudioRecorder();
-        recorder.run();
+        recorder.start();
     }
 
     public void addPoint(Double point) {
@@ -129,8 +129,8 @@ public class AudioView extends View {
             drawPoints(canvas);
         }
         recorder.close();
-        AudioRecorder recorder = new AudioRecorder();
-        recorder.run();
+        recorder = new AudioRecorder();
+        recorder.start();
         this.i++;
     }
 

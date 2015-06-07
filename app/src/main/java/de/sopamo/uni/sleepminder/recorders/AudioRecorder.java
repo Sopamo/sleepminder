@@ -16,6 +16,8 @@ public class AudioRecorder extends Thread {
 
     @Override
     public void run() {
+        Log.e("foorecord","start");
+        stopped = false;
         android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
         short[]   buffer  = new short[1600];
 
@@ -38,11 +40,9 @@ public class AudioRecorder extends Thread {
             recorder.stop();
         } catch(Throwable x) {
             Log.e("AudioRecorder", "Error reading voice audio", x);
-        } finally {
-            close();
         }
         Log.e("record", "done");
-        if(!stopped) {
+        if(!this.stopped) {
             this.run();
         }
     }
@@ -55,9 +55,13 @@ public class AudioRecorder extends Thread {
 
         MyApplication.noiseModel.calculateFrame();
 
-        AudioView.instance.addPoint2(MyApplication.noiseModel.getNormalizedRLH(), MyApplication.noiseModel.getNormalizedVAR());
-        AudioView.lux = (float)(MyApplication.noiseModel.getNormalizedRMS());
-        AudioView.instance.invalidate();
+
+        if(AudioView.instance != null) {
+            AudioView.instance.addPoint2(MyApplication.noiseModel.getNormalizedRLH(), MyApplication.noiseModel.getNormalizedVAR());
+            AudioView.lux = (float)(MyApplication.noiseModel.getNormalizedRMS());
+            AudioView.instance.invalidate();
+        }
+
     }
 
     private double calculateRMS(short[] buffer) {

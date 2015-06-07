@@ -1,9 +1,11 @@
 package de.sopamo.uni.sleepminder.activities;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,7 +24,9 @@ import de.sopamo.uni.sleepminder.RecordingService;
 import de.sopamo.uni.sleepminder.activities.support.NightListAdapter;
 import de.sopamo.uni.sleepminder.storage.FileHandler;
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends Activity {
+
+    private NightListAdapter nightListAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +49,11 @@ public class MainActivity extends ActionBarActivity {
                     synchronizeStartButtonState(false);
                     Snackbar
                             .make(findViewById(R.id.main_layout), R.string.recording_complete, Snackbar.LENGTH_LONG)
-                            .show(); // Don’t forget to show!
+                            .show();
+
+                    // Update the nights list
+                    nightListAdapter.notifyDataSetChanged();
+
                 } else {
 
                     // Start the tracking service
@@ -83,10 +91,10 @@ public class MainActivity extends ActionBarActivity {
 
     private void setupNightList() {
         ArrayList<File> nights = new ArrayList<>(Arrays.asList(FileHandler.listFiles()));
-        NightListAdapter adapter = new NightListAdapter(this, android.R.layout.simple_list_item_1, nights);
+        nightListAdapter = new NightListAdapter(this, android.R.layout.simple_list_item_1, nights);
 
         final ListView listView = (ListView) findViewById(R.id.nights_list);
-        listView.setAdapter(adapter);
+        listView.setAdapter(nightListAdapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

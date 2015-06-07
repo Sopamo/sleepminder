@@ -39,7 +39,7 @@ public class Recorder {
         lightRecorder.start(context);
 
         audioRecorder = new AudioRecorder();
-        audioRecorder.run();
+        audioRecorder.start();
 
         PowerManager mgr = (PowerManager)context.getSystemService(Context.POWER_SERVICE);
         wakeLock = mgr.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "SleepMinderLock");
@@ -62,7 +62,8 @@ public class Recorder {
                             Log.e("foo","current lux null");
                         }
                         if(MyApplication.noiseModel != null) {
-                            data += " " + String.valueOf(MyApplication.noiseModel.getEvent());
+                            //data += " " + String.valueOf(MyApplication.noiseModel.getEvent());
+                            data += " " + String.valueOf(MyApplication.noiseModel.getNormalizedVAR());
                         } else {
                             data += " " + "-1";
                             Log.e("foo","Noise model not initiated");
@@ -92,16 +93,26 @@ public class Recorder {
     public void stop(Context context) {
         synchronized (this) {
             if (lightRecorder != null) {
-                // Stop all recorders
+                // Stop the light recorder
                 lightRecorder.stop(context);
                 // Cleanup
                 lightRecorder = null;
             }
 
+            if(audioRecorder != null) {
+                // Stop the audio recorder
+                audioRecorder.close();
+                // Cleanup
+                audioRecorder = null;
+            }
+
+            // Release the lock
             wakeLock.release();
 
             // Write the data to a file
             dumpData();
+
+            // Cleanup
             startTime = "";
             running = false;
         }
