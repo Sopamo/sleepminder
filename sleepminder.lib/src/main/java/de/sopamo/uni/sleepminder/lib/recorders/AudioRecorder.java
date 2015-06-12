@@ -1,18 +1,29 @@
-package de.sopamo.uni.sleepminder.recorders;
+package de.sopamo.uni.sleepminder.lib.recorders;
 
-import android.app.Application;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.util.Log;
 
-import de.sopamo.uni.sleepminder.AudioView;
-import de.sopamo.uni.sleepminder.MyApplication;
+import de.sopamo.uni.sleepminder.lib.DebugView;
+import de.sopamo.uni.sleepminder.lib.detection.NoiseModel;
 
 public class AudioRecorder extends Thread {
     private boolean stopped = false;
     private static AudioRecord recorder = null;
     private static int N = 0;
+    private NoiseModel noiseModel;
+    private DebugView debugView;
+
+    public AudioRecorder(NoiseModel noiseModel) {
+        this.noiseModel = noiseModel;
+    }
+
+    public AudioRecorder(NoiseModel noiseModel, DebugView debugView) {
+
+        this.noiseModel = noiseModel;
+        this.debugView = debugView;
+    }
 
     @Override
     public void run() {
@@ -49,17 +60,22 @@ public class AudioRecorder extends Thread {
 
     private void process(short[] buffer) {
 
-        MyApplication.noiseModel.addRLH(calculateRLH(buffer));
-        MyApplication.noiseModel.addRMS(calculateRMS(buffer));
-        MyApplication.noiseModel.addVAR(calculateVar(buffer));
+        noiseModel.addRLH(calculateRLH(buffer));
+        noiseModel.addRMS(calculateRMS(buffer));
+        noiseModel.addVAR(calculateVar(buffer));
 
-        MyApplication.noiseModel.calculateFrame();
+        noiseModel.calculateFrame();
 
+        if(debugView != null) {
+            debugView.addPoint2(noiseModel.getNormalizedRLH(), noiseModel.getNormalizedVAR());
+            debugView.setLux((float) (noiseModel.getNormalizedRMS()));
+            debugView.post(new Runnable() {
+                @Override
+                public void run() {
+                    debugView.invalidate();
+                }
+            });
 
-        if(AudioView.instance != null) {
-            AudioView.instance.addPoint2(MyApplication.noiseModel.getNormalizedRLH(), MyApplication.noiseModel.getNormalizedVAR());
-            AudioView.lux = (float)(MyApplication.noiseModel.getNormalizedRMS());
-            AudioView.instance.invalidate();
         }
 
     }

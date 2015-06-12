@@ -2,10 +2,8 @@ package de.sopamo.uni.sleepminder.activities;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.design.widget.Snackbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,15 +11,14 @@ import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import de.sopamo.uni.sleepminder.MyApplication;
 import de.sopamo.uni.sleepminder.R;
-import de.sopamo.uni.sleepminder.RecordingService;
 import de.sopamo.uni.sleepminder.activities.support.NightListAdapter;
+import de.sopamo.uni.sleepminder.RecordingService;
 import de.sopamo.uni.sleepminder.storage.FileHandler;
 
 public class MainActivity extends Activity {
@@ -48,11 +45,11 @@ public class MainActivity extends Activity {
                     RecordingService.instance.stopSelf();
                     synchronizeStartButtonState(false);
                     Snackbar
-                            .make(findViewById(R.id.main_layout), R.string.recording_complete, Snackbar.LENGTH_LONG)
+                            .make(findViewById(R.id.main_layout), R.string.recording_complete, Snackbar.LENGTH_SHORT)
                             .show();
 
                     // Update the nights list
-                    nightListAdapter.notifyDataSetChanged();
+                    updateNightList();
 
                 } else {
 
@@ -107,6 +104,13 @@ public class MainActivity extends Activity {
                 MainActivity.this.startActivity(intent);
             }
         });
+    }
+
+    private void updateNightList() {
+        ArrayList<File> nights = new ArrayList<>(Arrays.asList(FileHandler.listFiles()));
+        nightListAdapter.clear();
+        nightListAdapter.addAll(nights);
+        nightListAdapter.notifyDataSetChanged();
     }
 
 

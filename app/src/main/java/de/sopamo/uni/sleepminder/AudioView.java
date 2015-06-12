@@ -9,9 +9,11 @@ import android.view.View;
 
 import java.util.ArrayList;
 
-import de.sopamo.uni.sleepminder.recorders.AudioRecorder;
+import de.sopamo.uni.sleepminder.lib.DebugView;
+import de.sopamo.uni.sleepminder.lib.detection.NoiseModel;
+import de.sopamo.uni.sleepminder.lib.recorders.AudioRecorder;
 
-public class AudioView extends View {
+public class AudioView extends View implements DebugView {
     Paint paint;
     ArrayList<Double> points = null;
     ArrayList<Double[]> points2 = null;
@@ -25,6 +27,7 @@ public class AudioView extends View {
     ArrayList<Double> rms = null;
 
     private AudioRecorder recorder;
+    private NoiseModel noiseModel;
 
     public AudioView(Context context) {
         super(context);
@@ -55,7 +58,9 @@ public class AudioView extends View {
         rms = new ArrayList<>();
         instance = this;
 
-        recorder = new AudioRecorder();
+        noiseModel = new NoiseModel();
+
+        recorder = new AudioRecorder(noiseModel,this);
         recorder.start();
     }
 
@@ -74,6 +79,10 @@ public class AudioView extends View {
         p[0] = x;
         p[1] = y;
         points2.add(p);
+    }
+
+    public void setLux(Float lux) {
+        AudioView.lux = lux;
     }
 
     public void addRMS(Double p) {
@@ -97,11 +106,7 @@ public class AudioView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        // TODO Auto-generated method stub
         super.onDraw(canvas);
-        //for(int i = 0;i<points.size();i++) {
-            //canvas.drawCircle(100+i*2, (int)(points.get(i)+600), 2, paint);
-        //}
 
         for(int i = 0;i<points2.size();i++) {
             Double[] p = points2.get(i);
@@ -109,8 +114,11 @@ public class AudioView extends View {
         }
         if(points2.size() > 0) {
             Double[] curr = points2.get(points2.size() - 1);
+            paint.setColor(Color.RED);
             canvas.drawText("RLH: " + curr[0], 100f, 200f, paint);
+            paint.setColor(Color.YELLOW);
             canvas.drawText("VAR: " + curr[1], 100f, 300f, paint);
+            paint.setColor(Color.BLUE);
             canvas.drawText("RMS: " + lux, 100f, 400f, paint);
             if(curr[1] > 1) { // Filter noise
                 if(curr[0] > 2) {
@@ -129,9 +137,10 @@ public class AudioView extends View {
             drawPoints(canvas);
         }
         recorder.close();
-        recorder = new AudioRecorder();
+        recorder = new AudioRecorder(noiseModel,this);
         recorder.start();
         this.i++;
+
     }
 
     protected void drawPoints(Canvas canvas) {

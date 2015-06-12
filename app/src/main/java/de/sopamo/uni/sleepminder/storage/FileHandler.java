@@ -9,8 +9,14 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import de.sopamo.uni.sleepminder.MyApplication;
+import de.sopamo.uni.sleepminder.lib.OutputHandler;
 
-public class FileHandler {
+public class FileHandler implements OutputHandler {
+
+    @Override
+    public void saveData(String data, String identifier) {
+        saveFile(data,"recording-" + identifier + ".txt");
+    }
 
     /**
      * Writes the data to the filename location
@@ -19,6 +25,7 @@ public class FileHandler {
      * @param filename
      */
     public static void saveFile(String data, String filename) {
+
         FileOutputStream outputStream;
 
         try {

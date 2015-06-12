@@ -9,6 +9,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 
 import de.sopamo.uni.sleepminder.activities.MainActivity;
+import de.sopamo.uni.sleepminder.storage.FileHandler;
 
 public class RecordingService extends Service {
 
@@ -36,7 +37,7 @@ public class RecordingService extends Service {
         startForeground(ONGOING_NOTIFICATION_ID, getNotification());
 
         // Start the tracker
-        MyApplication.recorder.start(MyApplication.context);
+        MyApplication.recorder.start(MyApplication.context, new FileHandler());
 
         return START_STICKY;
     }

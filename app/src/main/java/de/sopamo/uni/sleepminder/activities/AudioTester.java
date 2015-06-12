@@ -2,11 +2,8 @@ package de.sopamo.uni.sleepminder.activities;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.view.Menu;
-import android.view.MenuItem;
 
 import de.sopamo.uni.sleepminder.AudioView;
-import de.sopamo.uni.sleepminder.R;
 
 
 public class AudioTester extends ActionBarActivity {

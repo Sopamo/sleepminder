@@ -1,6 +1,4 @@
-package de.sopamo.uni.sleepminder.detection;
-
-import android.util.Log;
+package de.sopamo.uni.sleepminder.lib.detection;
 
 import java.util.ArrayList;
 import java.util.List;
