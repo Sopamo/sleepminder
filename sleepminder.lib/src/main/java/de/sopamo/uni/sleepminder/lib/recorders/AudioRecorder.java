@@ -27,8 +27,6 @@ public class AudioRecorder extends Thread {
 
     @Override
     public void run() {
-        Log.e("foorecord","start");
-        stopped = false;
         android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
         short[]   buffer  = new short[1600];
 
@@ -52,7 +50,6 @@ public class AudioRecorder extends Thread {
         } catch(Throwable x) {
             Log.e("AudioRecorder", "Error reading voice audio", x);
         }
-        Log.e("record", "done");
         if(!this.stopped) {
             this.run();
         }
@@ -107,7 +104,7 @@ public class AudioRecorder extends Thread {
             lowFreq[i] = lowFreq[i-1] + a * (buffer[i] - lowFreq[i-1]);
         }
 
-        return calculateRMS(buffer);
+        return calculateRMS(lowFreq);
     }
 
     private double calculateHighFreqRMS(short[] buffer) {

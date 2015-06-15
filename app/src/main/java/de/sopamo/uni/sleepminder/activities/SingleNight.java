@@ -40,6 +40,8 @@ public class SingleNight extends ActionBarActivity {
 
         ArrayList<Entry> valsComp1 = new ArrayList<Entry>();
         ArrayList<Entry> valsComp2 = new ArrayList<Entry>();
+        ArrayList<Entry> valsComp3 = new ArrayList<Entry>();
+        ArrayList<Entry> valsComp4 = new ArrayList<Entry>();
 
         ArrayList<String> xVals = new ArrayList<String>();
 
@@ -54,21 +56,32 @@ public class SingleNight extends ActionBarActivity {
             addPoint2(values[1], i - 1, j, start, xVals, valsComp2);
             j++;*/
             String[] values = parts[i].split(" ");
-            addPoint(values[0],i,j,start,xVals,valsComp1);
+            addPoint(values[0], i, j, start, xVals, valsComp1);
             addPoint2(values[1], i, j, start, xVals, valsComp2);
+            //addPoint2(values[2], i, j, start, xVals, valsComp3);
+            //addPoint2(values[3], i, j, start, xVals, valsComp4);
             j++;
         }
 
-        Log.e("fooval",valsComp1.size()+"");
-        Log.e("foox",xVals.size()+"");
 
         LineDataSet setComp1 = new LineDataSet(valsComp1, "Light");
         LineDataSet setComp2 = new LineDataSet(valsComp2, "Event");
+        ////LineDataSet setComp3 = new LineDataSet(valsComp3, "RLH");
+        ////LineDataSet setComp4 = new LineDataSet(valsComp4, "VAR");
         setComp2.setCircleColor(Color.RED);
+        setComp2.setColor(Color.RED);
+
+        ////setComp3.setCircleColor(Color.BLUE);
+        ////setComp3.setColor(Color.BLUE);
+
+        ////setComp4.setCircleColor(Color.YELLOW);
+        ////setComp4.setColor(Color.YELLOW);
 
         ArrayList<LineDataSet> dataSets = new ArrayList<LineDataSet>();
         dataSets.add(setComp1);
         dataSets.add(setComp2);
+        //dataSets.add(setComp3);
+        //dataSets.add(setComp4);
 
         LineData data = new LineData(xVals, dataSets);
         chart.setData(data);

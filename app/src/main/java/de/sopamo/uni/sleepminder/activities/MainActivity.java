@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -108,6 +109,9 @@ public class MainActivity extends Activity {
 
     private void updateNightList() {
         ArrayList<File> nights = new ArrayList<>(Arrays.asList(FileHandler.listFiles()));
+        for(File night:nights) {
+            Log.e("foo", night.getPath());
+        }
         nightListAdapter.clear();
         nightListAdapter.addAll(nights);
         nightListAdapter.notifyDataSetChanged();

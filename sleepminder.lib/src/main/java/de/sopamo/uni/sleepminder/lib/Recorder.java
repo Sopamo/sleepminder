@@ -71,9 +71,13 @@ public class Recorder {
                         Log.d(TAG, "current lux null");
                     }
 
-                    //data += " " + String.valueOf(MyApplication.noiseModel.getEvent());
                     data.append(" ");
-                    data.append(String.valueOf(noiseModel.getNormalizedVAR()));
+                    /*data.append(String.valueOf(noiseModel.getNormalizedRMS()));
+                    data.append(" ");
+                    data.append(String.valueOf(noiseModel.getNormalizedRLH()));
+                    data.append(" ");
+                    data.append(String.valueOf(noiseModel.getNormalizedVAR()));*/
+                    data.append(String.valueOf(noiseModel.getEvent()));
 
                     data.append(";");
                     // Dump the data to the text file if we accumulated "enough" Approximately every 15 minutes
