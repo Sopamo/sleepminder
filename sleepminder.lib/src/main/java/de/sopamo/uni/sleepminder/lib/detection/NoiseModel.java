@@ -58,7 +58,7 @@ public class NoiseModel {
      */
     public void calculateFrame() {
         if(getNormalizedVAR() > 1) { // Filter noise
-            if(getNormalizedRLH() > 2) {
+            if(getNormalizedRLH() > 1) {
                 snore++;
             } else {
                 if(getNormalizedRMS() > 0.5) {
@@ -89,7 +89,7 @@ public class NoiseModel {
         if(snore < 1 && movement < 2) {
             return 0;
         }
-        if(snore * 2 > movement) {
+        if(snore > 2) {
             return 1;
         } else {
             return 2;

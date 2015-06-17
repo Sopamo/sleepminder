@@ -86,19 +86,19 @@ public class AudioView extends View implements DebugView {
     }
 
     public void addRMS(Double p) {
-        if(rms.size() > 400) {
+        if(rms.size() > 200) {
             rms.remove(0);
         }
         rms.add(p);
     }
     public void addRLH(Double p) {
-        if(rlh.size() > 400) {
+        if(rlh.size() > 200) {
             rlh.remove(0);
         }
         rlh.add(p);
     }
     public void addVAR(Double p) {
-        if(var.size() > 400) {
+        if(var.size() > 200) {
             var.remove(0);
         }
         var.add(p);
@@ -136,9 +136,6 @@ public class AudioView extends View implements DebugView {
             addRMS((double) (lux * 20 + 900));
             drawPoints(canvas);
         }
-        recorder.close();
-        recorder = new AudioRecorder(noiseModel,this);
-        recorder.start();
         this.i++;
 
     }

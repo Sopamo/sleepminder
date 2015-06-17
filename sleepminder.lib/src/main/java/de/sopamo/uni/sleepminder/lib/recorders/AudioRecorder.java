@@ -1,9 +1,13 @@
 package de.sopamo.uni.sleepminder.lib.recorders;
 
 import android.media.AudioFormat;
+import android.media.AudioManager;
 import android.media.AudioRecord;
+import android.media.AudioTrack;
 import android.media.MediaRecorder;
 import android.util.Log;
+
+import java.io.IOException;
 
 import de.sopamo.uni.sleepminder.lib.DebugView;
 import de.sopamo.uni.sleepminder.lib.detection.NoiseModel;
@@ -14,6 +18,12 @@ public class AudioRecorder extends Thread {
     private static int N = 0;
     private NoiseModel noiseModel;
     private DebugView debugView;
+    private float[] lowFreq;
+    private float[] highFreq;
+    private short[] buffer;
+    private short[] fullbuffer;
+    MediaRecorder mRecorder;
+
 
     public AudioRecorder(NoiseModel noiseModel) {
         this.noiseModel = noiseModel;
@@ -27,32 +37,40 @@ public class AudioRecorder extends Thread {
 
     @Override
     public void run() {
+
+        capture();
+
+    }
+
+    private void capture() {
+        int i = 0;
         android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
-        short[]   buffer  = new short[1600];
+        if(lowFreq == null || highFreq == null || buffer == null) {
+            buffer  = new short[1600];
+            lowFreq = new float[buffer.length];
+            highFreq = new float[buffer.length];
+        }
 
-        try { // ... initialise
-            if(N == 0) {
-                N = AudioRecord.getMinBufferSize(16000, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
-                if(N < 1600) {
-                    N = 1600;
-                }
-                recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
-                        16000,
-                        AudioFormat.CHANNEL_IN_MONO,
-                        AudioFormat.ENCODING_PCM_16BIT,
-                        N);
+        if(N == 0) {
+            N = AudioRecord.getMinBufferSize(16000, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
+            if(N < 1600) {
+                N = 1600;
             }
-            recorder.startRecording();
+            recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
+                    16000,
+                    AudioFormat.CHANNEL_IN_MONO,
+                    AudioFormat.ENCODING_PCM_16BIT,
+                    N);
+        }
+        recorder.startRecording();
 
+        while(!this.stopped) {
             N = recorder.read(buffer, 0, buffer.length);
             process(buffer);
-            recorder.stop();
-        } catch(Throwable x) {
-            Log.e("AudioRecorder", "Error reading voice audio", x);
         }
-        if(!this.stopped) {
-            this.run();
-        }
+        recorder.stop();
+        recorder.release();
+
     }
 
     private void process(short[] buffer) {
@@ -94,8 +112,6 @@ public class AudioRecorder extends Thread {
     }
 
     private double calculateLowFreqRMS(short[] buffer) {
-        float[] lowFreq = new float[buffer.length];
-
         lowFreq[0] = 0;
 
         float a = 0.25f;
@@ -108,8 +124,6 @@ public class AudioRecorder extends Thread {
     }
 
     private double calculateHighFreqRMS(short[] buffer) {
-        float[] highFreq = new float[buffer.length];
-
         highFreq[0] = 0;
 
         float a = 0.25f;
