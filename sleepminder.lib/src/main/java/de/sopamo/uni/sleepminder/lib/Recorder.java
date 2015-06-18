@@ -85,6 +85,8 @@ public class Recorder {
                         dumpData();
                     }
 
+                    noiseModel.resetEvents();
+
                     // Restart in 5 seconds
                     customHandler.postDelayed(this, 5000);
                 }

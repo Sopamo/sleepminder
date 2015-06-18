@@ -86,7 +86,7 @@ public class NoiseModel {
     }
 
     public int getEvent() {
-        if(snore < 1 && movement < 2) {
+        if(snore <= 2 && movement < 5) {
             return 0;
         }
         if(snore > 2) {
@@ -94,6 +94,11 @@ public class NoiseModel {
         } else {
             return 2;
         }
+    }
+
+    public void resetEvents() {
+        snore = 0;
+        movement = 0;
     }
 
 }

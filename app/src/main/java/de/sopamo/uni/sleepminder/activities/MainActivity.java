@@ -109,9 +109,6 @@ public class MainActivity extends Activity {
 
     private void updateNightList() {
         ArrayList<File> nights = new ArrayList<>(Arrays.asList(FileHandler.listFiles()));
-        for(File night:nights) {
-            Log.e("foo", night.getPath());
-        }
         nightListAdapter.clear();
         nightListAdapter.addAll(nights);
         nightListAdapter.notifyDataSetChanged();
