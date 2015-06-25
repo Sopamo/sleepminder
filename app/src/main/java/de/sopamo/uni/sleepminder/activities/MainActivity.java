@@ -1,9 +1,12 @@
 package de.sopamo.uni.sleepminder.activities;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,7 +18,9 @@ import android.widget.ListView;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.Callable;
 
+import de.sopamo.uni.sleepminder.Hooks;
 import de.sopamo.uni.sleepminder.MyApplication;
 import de.sopamo.uni.sleepminder.R;
 import de.sopamo.uni.sleepminder.activities.support.NightListAdapter;
@@ -31,6 +36,18 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
+
+        if(!isExternalStorageWritable()) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Caution")
+                    .setMessage("The storage is not accessable. Please make sure to insert your sd-card and restart the app.")
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    })
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
+        }
 
         // Initialize start/stop button
         synchronizeStartButtonState(MyApplication.recorder.isRunning());
@@ -49,10 +66,20 @@ public class MainActivity extends Activity {
                             .make(findViewById(R.id.main_layout), R.string.recording_complete, Snackbar.LENGTH_SHORT)
                             .show();
 
-                    // Update the nights list
-                    updateNightList();
+                    Hooks.bind(Hooks.RECORDING_LIST_UPDATE, new Callable<Integer>() {
+                        @Override
+                        public Integer call() throws Exception {
+
+                            MainActivity.this.updateNightList();
+
+                            return 1;
+                        }
+                    });
+
 
                 } else {
+
+                    Hooks.remove(Hooks.RECORDING_LIST_UPDATE);
 
                     // Start the tracking service
                     Intent trackingIntent = new Intent(MainActivity.this, RecordingService.class);
@@ -68,7 +95,8 @@ public class MainActivity extends Activity {
         findViewById(R.id.start_test).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MainActivity.this.startActivity(new Intent(MainActivity.this, AudioTester.class));
+                updateNightList();
+                //MainActivity.this.startActivity(new Intent(MainActivity.this, AudioTester.class));
             }
         });
     }
@@ -80,7 +108,7 @@ public class MainActivity extends Activity {
      */
     private void synchronizeStartButtonState(boolean running) {
         ImageView button = (ImageView) findViewById(R.id.toggleRecording);
-        if(running) {
+        if (running) {
             button.setImageResource(R.drawable.ic_action_stop);
         } else {
             button.setImageResource(R.drawable.ic_action_play);
@@ -98,10 +126,10 @@ public class MainActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                File file = (File)listView.getItemAtPosition(position);
+                File file = (File) listView.getItemAtPosition(position);
 
                 Intent intent = new Intent(MainActivity.this, SingleNight.class);
-                intent.putExtra(SingleNight.EXTRA_FILE,file.getAbsolutePath());
+                intent.putExtra(SingleNight.EXTRA_FILE, file.getAbsolutePath());
                 MainActivity.this.startActivity(intent);
             }
         });
@@ -135,5 +163,13 @@ public class MainActivity extends Activity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public boolean isExternalStorageWritable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            return true;
+        }
+        return false;
     }
 }

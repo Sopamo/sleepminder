@@ -1,9 +1,15 @@
 package de.sopamo.uni.sleepminder.activities;
 
+import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
@@ -11,6 +17,8 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -18,10 +26,13 @@ import java.util.Date;
 import de.sopamo.uni.sleepminder.R;
 import de.sopamo.uni.sleepminder.storage.FileHandler;
 
-public class SingleNight extends ActionBarActivity {
+public class SingleNight extends AppCompatActivity {
 
     // Key for the filename
     public static String EXTRA_FILE = "file";
+
+    private File file;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,7 +40,7 @@ public class SingleNight extends ActionBarActivity {
         setContentView(R.layout.activity_single_night);
 
         // Get the file we want to view from the given path
-        File file = new File(getIntent().getExtras().getString(EXTRA_FILE));
+        file = new File(getIntent().getExtras().getString(EXTRA_FILE));
 
         String content = FileHandler.readFile(file);
 
@@ -101,5 +112,28 @@ public class SingleNight extends ActionBarActivity {
     private void addPoint2(String point, int timeshift, int position, String start, ArrayList<String> xVals, ArrayList<Entry> valsComp2) {
         Entry c1e1 = new Entry(Float.parseFloat(point), position);
         valsComp2.add(c1e1);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu items for use in the action bar
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.night_list_actions, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle presses on the action bar items
+        switch (item.getItemId()) {
+            case R.id.action_share:
+                Intent share = new Intent(Intent.ACTION_SEND);
+                share.setType("text/plain");
+                share.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
+                startActivity(Intent.createChooser(share, "Share Recording"));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }

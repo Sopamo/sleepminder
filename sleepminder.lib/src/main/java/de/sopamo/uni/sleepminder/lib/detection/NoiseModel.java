@@ -112,14 +112,14 @@ public class NoiseModel {
     }
 
     public int getEvent() {
-        if(snore <= 2 && movement < 5) {
-            return 0;
-        }
         if(snore > 2) {
             return 1;
         } else {
-            return 2;
+            if(movement > 2) {
+                return 2;
+            }
         }
+        return 0;
     }
 
     public int getIntensity() {

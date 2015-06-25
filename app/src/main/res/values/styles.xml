@@ -5,4 +5,7 @@
     <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
     </style>
 
+    <style name="AppTheme.ActionBar" parent="Theme.AppCompat">
+    </style>
+
 </resources>

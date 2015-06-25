@@ -1,6 +1,8 @@
 package de.sopamo.uni.sleepminder.storage;
 
 import android.content.Context;
+import android.os.Environment;
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -8,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 
+import de.sopamo.uni.sleepminder.Hooks;
 import de.sopamo.uni.sleepminder.MyApplication;
 import de.sopamo.uni.sleepminder.lib.OutputHandler;
 
@@ -16,6 +19,7 @@ public class FileHandler implements OutputHandler {
     @Override
     public void saveData(String data, String identifier) {
         saveFile(data,"recording-" + identifier + ".txt");
+        Hooks.call(Hooks.RECORDING_LIST_UPDATE);
     }
 
     /**
@@ -29,7 +33,7 @@ public class FileHandler implements OutputHandler {
         FileOutputStream outputStream;
 
         try {
-            outputStream = MyApplication.context.openFileOutput(filename, Context.MODE_APPEND);
+            outputStream = new FileOutputStream(new File(getStorageDir(), filename),true);
             outputStream.write(data.getBytes());
             outputStream.close();
         } catch (Exception e) {
@@ -62,7 +66,17 @@ public class FileHandler implements OutputHandler {
      * @return The list of internal storage files
      */
     public static File[] listFiles() {
-        File internalFiles = MyApplication.context.getFilesDir();
+        File internalFiles = getStorageDir();
         return internalFiles.listFiles();
     }
+
+    private static File getStorageDir() {
+        // Get the directory for the app's private pictures directory.
+        File file = MyApplication.context.getExternalFilesDir("recordings");
+        if (file == null || !file.mkdirs()) {
+            Log.d("FileHandler", "Directory not created");
+        }
+        return file;
+    }
+
 }
