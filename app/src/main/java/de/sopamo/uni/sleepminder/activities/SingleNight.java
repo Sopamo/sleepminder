@@ -11,10 +11,16 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import com.github.mikephil.charting.animation.AnimationEasing;
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.utils.ColorTemplate;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -97,9 +103,49 @@ public class SingleNight extends AppCompatActivity {
         //dataSets.add(setComp4);
 
         LineData data = new LineData(xVals, dataSets);
+        chart.setHardwareAccelerationEnabled(true);
         chart.setData(data);
-        chart.invalidate(); // refresh
+        chart.animateX(3000);
 
+        setupSleepStagesChart();
+
+        //chart.invalidate(); // refresh
+
+    }
+
+    private void setupSleepStagesChart() {
+
+        PieChart pieChart = (PieChart) findViewById(R.id.piechart);
+
+        ArrayList<Entry> pieComp1 = new ArrayList<Entry>();
+        Entry c1e1 = new Entry(100.000f, 0);
+        pieComp1.add(c1e1);
+        Entry c1e2 = new Entry(50.000f, 1);
+        pieComp1.add(c1e2);
+        Entry c1e3 = new Entry(20.000f, 2);
+        pieComp1.add(c1e3);
+
+        PieDataSet pieDataSet = new PieDataSet(pieComp1, "Sleep stages");
+        pieDataSet.setColors(ColorTemplate.JOYFUL_COLORS);
+
+        ArrayList<String> xPieVals = new ArrayList<String>();
+        xPieVals.add("Deep");
+        xPieVals.add("Light");
+        xPieVals.add("REM");
+
+        PieData pieData = new PieData(xPieVals,pieDataSet);
+        pieData.setValueTextSize(14);
+        pieData.setValueTextColor(Color.WHITE);
+        pieChart.setData(pieData);
+
+        Legend pieLegend = pieChart.getLegend();
+        pieLegend.setEnabled(false);
+
+        pieChart.setUsePercentValues(true);
+        pieChart.setDescription("");
+        pieChart.setHardwareAccelerationEnabled(true);
+
+        pieChart.animateX(1000);
     }
 
     private void addPoint(String point, int timeshift, int position, String start, ArrayList<String> xVals, ArrayList<Entry> valsComp1) {

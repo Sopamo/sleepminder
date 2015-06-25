@@ -95,8 +95,7 @@ public class MainActivity extends Activity {
         findViewById(R.id.start_test).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                updateNightList();
-                //MainActivity.this.startActivity(new Intent(MainActivity.this, AudioTester.class));
+                MainActivity.this.startActivity(new Intent(MainActivity.this, AudioTester.class));
             }
         });
     }

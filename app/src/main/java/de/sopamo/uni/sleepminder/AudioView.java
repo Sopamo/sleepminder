@@ -173,4 +173,8 @@ public class AudioView extends View implements DebugView {
             canvas.drawCircle(i*4,p.floatValue(), 8, paint);
         }
     }
+
+    public void stop() {
+        recorder.close();
+    }
 }

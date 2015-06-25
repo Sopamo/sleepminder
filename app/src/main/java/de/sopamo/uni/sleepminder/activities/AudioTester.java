@@ -8,12 +8,14 @@ import de.sopamo.uni.sleepminder.AudioView;
 
 public class AudioTester extends ActionBarActivity {
 
+    AudioView audioView;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         /*LightRecorder light = new LightRecorder();
         Log.e("light", light.sensorExists(getApplicationContext()) + "");*/
-        setContentView(new AudioView(this));
 
         /*
         setContentView(R.layout.activity_main);
@@ -49,5 +51,19 @@ public class AudioTester extends ActionBarActivity {
                 RecordingService.instance.stopSelf();
             }
         });*/
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        audioView = new AudioView(this);
+        setContentView(audioView);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        audioView.stop();
     }
 }
