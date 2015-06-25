@@ -78,6 +78,8 @@ public class Recorder {
                     data.append(" ");
                     data.append(String.valueOf(noiseModel.getNormalizedVAR()));*/
                     data.append(String.valueOf(noiseModel.getEvent()));
+                    data.append(" ");
+                    data.append(String.valueOf(noiseModel.getIntensity()));
 
                     data.append(";");
                     // Dump the data to the text file if we accumulated "enough" Approximately every 15 minutes

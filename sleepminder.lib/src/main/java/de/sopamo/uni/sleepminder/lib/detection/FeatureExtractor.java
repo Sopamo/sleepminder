@@ -1,5 +1,7 @@
 package de.sopamo.uni.sleepminder.lib.detection;
 
+import android.util.Log;
+
 /**
  * Created by paulmohr on 19.06.15.
  */

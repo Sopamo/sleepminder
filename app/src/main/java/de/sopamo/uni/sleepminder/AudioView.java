@@ -86,19 +86,19 @@ public class AudioView extends View implements DebugView {
     }
 
     public void addRMS(Double p) {
-        if(rms.size() > 200) {
+        if(rms.size() > 300) {
             rms.remove(0);
         }
         rms.add(p);
     }
     public void addRLH(Double p) {
-        if(rlh.size() > 200) {
+        if(rlh.size() > 300) {
             rlh.remove(0);
         }
         rlh.add(p);
     }
     public void addVAR(Double p) {
-        if(var.size() > 200) {
+        if(var.size() > 300) {
             var.remove(0);
         }
         var.add(p);

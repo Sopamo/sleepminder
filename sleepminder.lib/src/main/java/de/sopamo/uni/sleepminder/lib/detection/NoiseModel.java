@@ -1,5 +1,7 @@
 package de.sopamo.uni.sleepminder.lib.detection;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,13 +20,13 @@ public class NoiseModel {
     }
 
     public void addRMS(Double rms) {
-        if(RMS.size() >= 10) {
+        if(RMS.size() >= 100) {
             RMS.remove(0);
         }
         RMS.add(rms);
     }
     public void addRLH(Double rlh) {
-        if(RLH.size() >= 10) {
+        if(RLH.size() >= 100) {
             RLH.remove(0);
         }
         RLH.add(rlh);
@@ -53,17 +55,41 @@ public class NoiseModel {
         return (VAR.get(VAR.size()-1) - mean(VAR)) / std(VAR);
     }
 
+    public double getLastRMS() {
+        if(RMS.size() <= 1) return 0d;
+        return RMS.get(RMS.size()-1);
+    }
+    public double getLastVAR() {
+        if(VAR.size() <= 1) return 0d;
+        return VAR.get(VAR.size()-1);
+    }
+    public double getLastRLH() {
+        if(RLH.size() <= 1) return 0d;
+        return RLH.get(RLH.size()-1);
+    }
+
     /**
      * This detects which event occured in the current frame
      */
     public void calculateFrame() {
-        if(getNormalizedVAR() > 1) { // Filter noise
+        /*if(getNormalizedVAR() > 1) { // Filter noise
             if(getNormalizedRLH() > 1) {
                 snore++;
             } else {
                 if(getNormalizedRMS() > 0.5) {
                     movement++;
                 }
+            }
+        }*/
+        if(getLastRLH() > 10) {
+            if(getNormalizedVAR() > 2) {
+                snore++;
+                Log.e("event","snore");
+            }
+        } else {
+            if(getLastRMS() > 15 && getNormalizedVAR() > 0.5d && (getLastRLH() > 1d || getLastRLH() < -1d)) {
+                movement++;
+                Log.e("event","movement");
             }
         }
     }
@@ -94,6 +120,15 @@ public class NoiseModel {
         } else {
             return 2;
         }
+    }
+
+    public int getIntensity() {
+        if(getEvent() == 1) {
+            return snore;
+        } else if(getEvent() == 2) {
+            return movement;
+        }
+        return 0;
     }
 
     public void resetEvents() {

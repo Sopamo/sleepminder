@@ -58,6 +58,7 @@ public class SingleNight extends ActionBarActivity {
             String[] values = parts[i].split(" ");
             addPoint(values[0], i, j, start, xVals, valsComp1);
             addPoint2(values[1], i, j, start, xVals, valsComp2);
+            addPoint2(values[2], i, j, start, xVals, valsComp3);
             //addPoint2(values[2], i, j, start, xVals, valsComp3);
             //addPoint2(values[3], i, j, start, xVals, valsComp4);
             j++;
@@ -66,13 +67,14 @@ public class SingleNight extends ActionBarActivity {
 
         LineDataSet setComp1 = new LineDataSet(valsComp1, "Light");
         LineDataSet setComp2 = new LineDataSet(valsComp2, "Event");
+        LineDataSet setComp3 = new LineDataSet(valsComp3, "Intensity");
         ////LineDataSet setComp3 = new LineDataSet(valsComp3, "RLH");
         ////LineDataSet setComp4 = new LineDataSet(valsComp4, "VAR");
         setComp2.setCircleColor(Color.RED);
         setComp2.setColor(Color.RED);
 
-        ////setComp3.setCircleColor(Color.BLUE);
-        ////setComp3.setColor(Color.BLUE);
+        setComp3.setCircleColor(Color.BLUE);
+        setComp3.setColor(Color.BLUE);
 
         ////setComp4.setCircleColor(Color.YELLOW);
         ////setComp4.setColor(Color.YELLOW);
@@ -80,7 +82,7 @@ public class SingleNight extends ActionBarActivity {
         ArrayList<LineDataSet> dataSets = new ArrayList<LineDataSet>();
         dataSets.add(setComp1);
         dataSets.add(setComp2);
-        //dataSets.add(setComp3);
+        dataSets.add(setComp3);
         //dataSets.add(setComp4);
 
         LineData data = new LineData(xVals, dataSets);
