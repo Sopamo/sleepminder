@@ -112,10 +112,10 @@ public class NoiseModel {
     }
 
     public int getEvent() {
-        if(snore > 2) {
+        if(snore > 5) {
             return 1;
         } else {
-            if(movement > 2) {
+            if(movement > 1) {
                 return 2;
             }
         }
