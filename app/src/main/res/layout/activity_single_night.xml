@@ -36,6 +36,28 @@
                     android:layout_width="0dp"
                     android:layout_height="200dp" />
             </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <com.github.mikephil.charting.charts.PieChart
+                    android:id="@+id/lightquality"
+                    android:layout_weight="0.5"
+                    android:layout_width="0dp"
+                    android:layout_height="200dp" />
+
+                <TextView
+                    android:id="@+id/qualityindicator"
+                    android:layout_width="0dp"
+                    android:layout_height="200dp"
+                    android:text="74%"
+                    android:textSize="80sp"
+                    android:textColor="@android:color/white"
+                    android:layout_weight="0.5"
+                    android:gravity="center"  />
+
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

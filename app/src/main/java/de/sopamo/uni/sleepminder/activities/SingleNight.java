@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import com.github.mikephil.charting.animation.AnimationEasing;
 import com.github.mikephil.charting.charts.CombinedChart;
@@ -75,7 +76,7 @@ public class SingleNight extends AppCompatActivity {
         int movements = 0;
 
         // 10 minute intervals
-        int[] intervals = new int[(int)Math.ceil(parts.length/100f)];
+        int[] intervals = new int[(int)Math.ceil(parts.length/300f)];
 
         int sleepEvents = 0;
         int movementEvents = 0;
@@ -83,6 +84,10 @@ public class SingleNight extends AppCompatActivity {
 
         int awake = 0;
         int sleep = 0;
+
+        int nightLight = 0;
+        int dawnLight = 0;
+        int dayLight = 0;
 
         for(int i = 2;i<parts.length;i++) {
             /*if(parts[i-1].equals(parts[i])) {
@@ -102,22 +107,26 @@ public class SingleNight extends AppCompatActivity {
             if(values[1].equals("0")) {
                 sleepEvents++;
             }
+            if(values[1].equals("1")) {
+                snoreEvents++;
+            }
             if(values[1].equals("2")) {
                 movementEvents++;
                 movements++;
             }
-            if(values[1].equals("1")) {
-                snoreEvents++;
+            int lightIntensity = Integer.parseInt(values[0]);
+            if(lightIntensity <= 20) {
+                nightLight++;
+            } else if(lightIntensity <= 100) {
+                dawnLight++;
+            } else {
+                dayLight++;
             }
 
-            // Set x value
-            long dv = (Long.valueOf(start) + 5 * j) * 1000;
-            Date df = new java.util.Date(dv);
-            xVals.add(new SimpleDateFormat("HH:mm").format(df));
 
-            if(i % 100 == 0) {
+            if(i % 300 == 0) {
                 if(movements > 1) {
-                    intervals[(int) (i / 100f)] = movements;
+                    intervals[(int) (i / 300f)] = movements;
                     awake++;
                 } else {
                     sleep++;
@@ -125,20 +134,81 @@ public class SingleNight extends AppCompatActivity {
                 movements = 0;
             }
         }
+
+        int phases = 0;
+        boolean isSleeping = false;
+
         for(int i = 0;i<intervals.length;i++) {
-            for(int k =0;k<100;k++) {
-                if(sleepStageEntries.size() >= xVals.size()) {
-                    break;
-                }
-                sleepStageEntries.add(new BarEntry(intervals[i],i*100+k));
+            // Set x value
+            long dv = (Long.valueOf(start) + 5 * (i*300)) * 1000;
+            Date df = new java.util.Date(dv);
+            xVals.add(new SimpleDateFormat("HH:mm").format(df));
+
+            int movementAmount = 0;
+            if(intervals[i] > 1) {
+                movementAmount = intervals[i];
             }
+
+            sleepStageEntries.add(new BarEntry(movementAmount,i));
+            if(movementAmount > 1) {
+                if(isSleeping) {
+                    phases++;
+                    isSleeping = false;
+                }
+            } else {
+                if(!isSleeping) {
+                    phases++;
+                    isSleeping = true;
+                }
+            }
+        }
+
+        int qualityLight = 1;
+        // If one hour of the sleep was during daylight consider the light quality bad
+        if(dayLight >= 36000) {
+            qualityLight = -1;
+        } else if(dawnLight >= 36000) {
+            // If one hour of the sleep was during dawn, consider the light quality medium
+            qualityLight = 0;
+        }
+
+        int qualityPhases = 1;
+        // Too much phases are no good sign
+        if(phases > 10) {
+            qualityPhases = 0;
+        }
+
+        int qualitySleep = -1;
+        if(parts.length >= 0.1 * 60*60*7.5) {
+            // At least 7.5 hours of sleep
+            qualitySleep = 1;
+        } else if(parts.length >= 0.1 * 60*60*6.5) {
+            // At least 6.5 hours of sleep
+            qualitySleep = 0;
+        }
+
+        int averageQuality = Math.round((qualityLight + qualityPhases + qualitySleep) / 3f);
+        TextView qualityIndicator = (TextView)findViewById(R.id.qualityindicator);
+        switch (averageQuality) {
+            case -1:
+                qualityIndicator.setText("-");
+                qualityIndicator.setTextColor(Color.RED);
+                break;
+            case 0:
+                qualityIndicator.setText("o");
+                qualityIndicator.setTextColor(Color.GRAY);
+                break;
+            case 1:
+                qualityIndicator.setText("+");
+                qualityIndicator.setTextColor(Color.GREEN);
+                break;
         }
 
 
         LineDataSet setComp1 = new LineDataSet(valsComp1, "Light");
         LineDataSet setComp2 = new LineDataSet(valsComp2, "Event");
         LineDataSet setComp3 = new LineDataSet(valsComp3, "Intensity");
-        BarDataSet sleepStagesSet = new BarDataSet(sleepStageEntries, "Sleep Stage");
+        BarDataSet sleepStagesSet = new BarDataSet(sleepStageEntries, "Light sleep");
         setComp2.setCircleColor(Color.RED);
         setComp2.setColor(Color.RED);
 
@@ -166,6 +236,7 @@ public class SingleNight extends AppCompatActivity {
 
         setupSleepStagesChart(sleep,awake);
         setupSleepEventsChart(sleepEvents,movementEvents,snoreEvents);
+        setupLightChart(nightLight, dawnLight, dayLight);
 
 
     }
@@ -181,7 +252,7 @@ public class SingleNight extends AppCompatActivity {
         pieComp1.add(c1e2);
 
         PieDataSet pieDataSet = new PieDataSet(pieComp1, "Sleep stages");
-        pieDataSet.setColors(ColorTemplate.JOYFUL_COLORS);
+        pieDataSet.setColors(ColorTemplate.PASTEL_COLORS);
 
         ArrayList<String> xPieVals = new ArrayList<String>();
         xPieVals.add("Deep");
@@ -215,7 +286,7 @@ public class SingleNight extends AppCompatActivity {
         pieComp1.add(c1e3);
 
         PieDataSet pieDataSet = new PieDataSet(pieComp1, "Sleep events");
-        pieDataSet.setColors(ColorTemplate.JOYFUL_COLORS);
+        pieDataSet.setColors(ColorTemplate.PASTEL_COLORS);
 
         ArrayList<String> xPieVals = new ArrayList<String>();
         xPieVals.add("None");
@@ -232,6 +303,43 @@ public class SingleNight extends AppCompatActivity {
 
         pieChart.setUsePercentValues(true);
         pieChart.setDescription("Sleep events");
+        pieChart.setHardwareAccelerationEnabled(true);
+
+        pieChart.animateX(1000);
+    }
+
+
+
+    private void setupLightChart(int night, int dawn, int day) {
+
+        PieChart pieChart = (PieChart) findViewById(R.id.lightquality);
+
+        ArrayList<Entry> pieComp1 = new ArrayList<Entry>();
+        Entry c1e1 = new Entry(night, 0);
+        pieComp1.add(c1e1);
+        Entry c1e2 = new Entry(dawn, 1);
+        pieComp1.add(c1e2);
+        Entry c1e3 = new Entry(day, 2);
+        pieComp1.add(c1e3);
+
+        PieDataSet pieDataSet = new PieDataSet(pieComp1, "Light quality");
+        pieDataSet.setColors(ColorTemplate.PASTEL_COLORS);
+
+        ArrayList<String> xPieVals = new ArrayList<String>();
+        xPieVals.add("Night");
+        xPieVals.add("Dawn");
+        xPieVals.add("Day");
+
+        PieData pieData = new PieData(xPieVals,pieDataSet);
+        pieData.setValueTextSize(14);
+        pieData.setValueTextColor(Color.WHITE);
+        pieChart.setData(pieData);
+
+        Legend pieLegend = pieChart.getLegend();
+        pieLegend.setEnabled(false);
+
+        pieChart.setUsePercentValues(true);
+        pieChart.setDescription("Light quality");
         pieChart.setHardwareAccelerationEnabled(true);
 
         pieChart.animateX(1000);
