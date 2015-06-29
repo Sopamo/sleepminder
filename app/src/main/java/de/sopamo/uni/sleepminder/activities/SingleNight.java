@@ -2,6 +2,7 @@ package de.sopamo.uni.sleepminder.activities;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -13,10 +14,15 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.animation.AnimationEasing;
+import com.github.mikephil.charting.charts.Chart;
 import com.github.mikephil.charting.charts.CombinedChart;
+import com.github.mikephil.charting.charts.HorizontalBarChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.charts.RadarChart;
 import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
@@ -27,6 +33,8 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.RadarData;
+import com.github.mikephil.charting.data.RadarDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
 
 import java.io.File;
@@ -52,8 +60,12 @@ public class SingleNight extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_single_night);
 
+        String filename = getIntent().getExtras().getString(EXTRA_FILE);
+
+        setDateTitle(filename);
+
         // Get the file we want to view from the given path
-        file = new File(getIntent().getExtras().getString(EXTRA_FILE));
+        file = new File(filename);
 
         String content = FileHandler.readFile(file);
 
@@ -62,21 +74,19 @@ public class SingleNight extends AppCompatActivity {
 
         CombinedChart chart = (CombinedChart)findViewById(R.id.chart);
 
-        ArrayList<Entry> valsComp1 = new ArrayList<Entry>();
-        ArrayList<Entry> valsComp2 = new ArrayList<Entry>();
-        ArrayList<Entry> valsComp3 = new ArrayList<Entry>();
-        ArrayList<Entry> valsComp4 = new ArrayList<Entry>();
+        ArrayList<Entry> lightStageEntries = new ArrayList<>();
 
-        ArrayList<BarEntry> sleepStageEntries = new ArrayList<BarEntry>();
+        ArrayList<BarEntry> sleepStageEntries = new ArrayList<>();
 
-        ArrayList<String> xVals = new ArrayList<String>();
+        ArrayList<String> xVals = new ArrayList<>();
 
         int j = 0;
 
         int movements = 0;
 
-        // 10 minute intervals
+        // 30 minute intervals
         int[] intervals = new int[(int)Math.ceil(parts.length/300f)];
+        int[] lightIntervals = new int[(int)Math.ceil(parts.length/300f)];
 
         int sleepEvents = 0;
         int movementEvents = 0;
@@ -89,20 +99,10 @@ public class SingleNight extends AppCompatActivity {
         int dawnLight = 0;
         int dayLight = 0;
 
+        ArrayList<Integer> lightsIntensities = new ArrayList<>();
+
         for(int i = 2;i<parts.length;i++) {
-            /*if(parts[i-1].equals(parts[i])) {
-                continue;
-            }
-            String[] values = parts[i-1].split(" ");
-            addPoint(values[0],i-1,j,start,xVals,valsComp1);
-            addPoint2(values[1], i - 1, j, start, xVals, valsComp2);
-            j++;*/
             String[] values = parts[i].split(" ");
-            //addPoint(values[0], i, j, start, xVals, valsComp1);
-            //addPoint2(values[1], i, j, start, xVals, valsComp2);
-            //addPoint2(values[2], i, j, start, xVals, valsComp3);
-            //addPoint2(values[2], i, j, start, xVals, valsComp3);
-            //addPoint2(values[3], i, j, start, xVals, valsComp4);
             j++;
             if(values[1].equals("0")) {
                 sleepEvents++;
@@ -123,8 +123,11 @@ public class SingleNight extends AppCompatActivity {
                 dayLight++;
             }
 
+            lightsIntensities.add(lightIntensity);
+
 
             if(i % 300 == 0) {
+                // Add the movement interval
                 if(movements > 1) {
                     intervals[(int) (i / 300f)] = movements;
                     awake++;
@@ -132,6 +135,14 @@ public class SingleNight extends AppCompatActivity {
                     sleep++;
                 }
                 movements = 0;
+
+                // Add the light interval
+                int lightSum = 0;
+                for(Integer intensity: lightsIntensities) {
+                    lightSum += intensity;
+                }
+                lightIntervals[(int) (i / 300f)] = lightSum / lightsIntensities.size();
+                lightsIntensities.clear();
             }
         }
 
@@ -161,6 +172,9 @@ public class SingleNight extends AppCompatActivity {
                     isSleeping = true;
                 }
             }
+
+            lightStageEntries.add(new Entry(lightIntervals[i],i));
+
         }
 
         int qualityLight = 1;
@@ -191,48 +205,66 @@ public class SingleNight extends AppCompatActivity {
         TextView qualityIndicator = (TextView)findViewById(R.id.qualityindicator);
         switch (averageQuality) {
             case -1:
-                qualityIndicator.setText("-");
-                qualityIndicator.setTextColor(Color.RED);
+                qualityIndicator.setText("\uD83D\uDE21");
                 break;
             case 0:
-                qualityIndicator.setText("o");
-                qualityIndicator.setTextColor(Color.GRAY);
+                qualityIndicator.setText("\uD83D\uDE12");
                 break;
             case 1:
-                qualityIndicator.setText("+");
-                qualityIndicator.setTextColor(Color.GREEN);
+                qualityIndicator.setText("☺");
                 break;
         }
 
 
-        LineDataSet setComp1 = new LineDataSet(valsComp1, "Light");
-        LineDataSet setComp2 = new LineDataSet(valsComp2, "Event");
-        LineDataSet setComp3 = new LineDataSet(valsComp3, "Intensity");
-        BarDataSet sleepStagesSet = new BarDataSet(sleepStageEntries, "Light sleep");
-        setComp2.setCircleColor(Color.RED);
-        setComp2.setColor(Color.RED);
+        BarDataSet sleepStagesSet = new BarDataSet(sleepStageEntries, "Movement");
+        sleepStagesSet.setColor(Color.parseColor("#334D5B"));
+        sleepStagesSet.setAxisDependency(YAxis.AxisDependency.LEFT);
+        sleepStagesSet.setDrawValues(false);
 
-        setComp3.setCircleColor(Color.BLUE);
-        setComp3.setColor(Color.BLUE);
-
+        LineDataSet lightStagesSet = new LineDataSet(lightStageEntries, "Lux value");
+        lightStagesSet.setAxisDependency(YAxis.AxisDependency.RIGHT);
+        lightStagesSet.setColor(Color.parseColor("#EDC55B"));
+        lightStagesSet.setDrawValues(false);
+        lightStagesSet.setCircleColor(Color.parseColor("#EDC55B"));
+        lightStagesSet.setCircleColorHole(Color.parseColor("#d7b351"));
+        lightStagesSet.setCircleSize(2);
+        lightStagesSet.setLineWidth(2);
+        lightStagesSet.setFillColor(Color.parseColor("#EDC55B"));
+        lightStagesSet.setFillAlpha(80);
+        lightStagesSet.setDrawFilled(true);
 
         LineData lineDates = new LineData();
-        lineDates.addDataSet(setComp1);
-        lineDates.addDataSet(setComp2);
-        lineDates.addDataSet(setComp3);
+        lineDates.addDataSet(lightStagesSet);
 
         BarData barData = new BarData();
         barData.addDataSet(sleepStagesSet);
 
         CombinedData data = new CombinedData(xVals);
 
-        //data.setData(lineDates);
+        data.setData(lineDates);
         data.setData(barData);
 
         chart.setHardwareAccelerationEnabled(true);
         chart.setData(data);
+        chart.setDrawGridBackground(false);
+        chart.setDrawBorders(false);
 
-        chart.invalidate(); // refresh
+        YAxis leftAxis = chart.getAxisLeft();
+        leftAxis.setTextColor(Color.parseColor("#344D5B"));
+        leftAxis.setAxisMaxValue(sleepStagesSet.getYMax());
+        leftAxis.setAxisMinValue(0f);
+        leftAxis.setDrawGridLines(true);
+
+        YAxis rightAxis = chart.getAxisRight();
+        rightAxis.setTextColor(Color.parseColor("#EDC65C"));
+        rightAxis.setAxisMaxValue(lightStagesSet.getYMax());
+        rightAxis.setAxisMinValue(0);
+        rightAxis.setDrawGridLines(false);
+
+        chart.setDescription("");
+
+        //chart.invalidate(); // refresh
+        chart.animateY(1000);
 
         setupSleepStagesChart(sleep,awake);
         setupSleepEventsChart(sleepEvents,movementEvents,snoreEvents);
@@ -256,7 +288,7 @@ public class SingleNight extends AppCompatActivity {
 
         ArrayList<String> xPieVals = new ArrayList<String>();
         xPieVals.add("Deep");
-        xPieVals.add("Light / Awake");
+        xPieVals.add("Light");
 
         PieData pieData = new PieData(xPieVals,pieDataSet);
         pieData.setValueTextSize(14);
@@ -269,31 +301,36 @@ public class SingleNight extends AppCompatActivity {
         pieChart.setUsePercentValues(true);
         pieChart.setDescription("Sleep stages");
         pieChart.setHardwareAccelerationEnabled(true);
+        pieChart.setBackgroundColor(Color.parseColor("#52B19D"));
 
-        pieChart.animateX(1000);
+        pieChart.setHoleColor(Color.parseColor("#52B09C"));
+
+        pieChart.invalidate();
     }
 
     private void setupSleepEventsChart(int sleep, int movement, int snore) {
 
-        PieChart pieChart = (PieChart) findViewById(R.id.sleepevents);
+        HorizontalBarChart pieChart = (HorizontalBarChart) findViewById(R.id.sleepevents);
 
-        ArrayList<Entry> pieComp1 = new ArrayList<Entry>();
-        Entry c1e1 = new Entry(sleep, 0);
+        ArrayList<BarEntry> pieComp1 = new ArrayList<BarEntry>();
+        BarEntry c1e1 = new BarEntry(sleep, 0);
         pieComp1.add(c1e1);
-        Entry c1e2 = new Entry(movement, 1);
+        BarEntry c1e2 = new BarEntry(movement, 1);
         pieComp1.add(c1e2);
-        Entry c1e3 = new Entry(snore, 1);
+        BarEntry c1e3 = new BarEntry(snore, 1);
         pieComp1.add(c1e3);
 
-        PieDataSet pieDataSet = new PieDataSet(pieComp1, "Sleep events");
+        BarDataSet pieDataSet = new BarDataSet(pieComp1, "Sleep events");
         pieDataSet.setColors(ColorTemplate.PASTEL_COLORS);
+        pieDataSet.setDrawValues(false);
+
 
         ArrayList<String> xPieVals = new ArrayList<String>();
         xPieVals.add("None");
         xPieVals.add("Movement");
         xPieVals.add("Snore");
 
-        PieData pieData = new PieData(xPieVals,pieDataSet);
+        BarData pieData = new BarData(xPieVals,pieDataSet);
         pieData.setValueTextSize(14);
         pieData.setValueTextColor(Color.WHITE);
         pieChart.setData(pieData);
@@ -301,11 +338,15 @@ public class SingleNight extends AppCompatActivity {
         Legend pieLegend = pieChart.getLegend();
         pieLegend.setEnabled(false);
 
-        pieChart.setUsePercentValues(true);
+        pieChart.getAxisLeft().setEnabled(false);
+        pieChart.getAxisRight().setEnabled(false);
+        pieChart.setGridBackgroundColor(Color.parseColor("#52B19D"));
+
         pieChart.setDescription("Sleep events");
         pieChart.setHardwareAccelerationEnabled(true);
+        pieChart.setDrawBorders(false);
 
-        pieChart.animateX(1000);
+        pieChart.invalidate();
     }
 
 
@@ -342,7 +383,9 @@ public class SingleNight extends AppCompatActivity {
         pieChart.setDescription("Light quality");
         pieChart.setHardwareAccelerationEnabled(true);
 
-        pieChart.animateX(1000);
+        pieChart.setHoleColor(Color.parseColor("#52B09C"));
+
+        pieChart.invalidate();
     }
 
     private void addPoint(String point, int timeshift, int position, String start, ArrayList<String> xVals, ArrayList<Entry> valsComp1) {
@@ -378,5 +421,13 @@ public class SingleNight extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void setDateTitle(String filename) {
+        String timestamp = filename.substring(filename.length()-14,filename.length()-4);
+        long dv = Long.valueOf(timestamp)*1000;
+        Date df = new java.util.Date(dv);
+
+        setTitle(new SimpleDateFormat("dd.MM.y HH:mm").format(df));
     }
 }

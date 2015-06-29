@@ -15,6 +15,7 @@
         android:layout_marginTop="90dp"
         android:src="@drawable/ic_action_play"
         android:elevation="15dp"
+        android:backgroundTint="#EDC55B"
         app:borderWidth="0dp"
         android:layout_centerHorizontal="true" />
 
