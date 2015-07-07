@@ -156,19 +156,18 @@ public class SingleNight extends AppCompatActivity {
             xVals.add(new SimpleDateFormat("HH:mm").format(df));
 
             int movementAmount = 0;
-            if(intervals[i] > 1) {
+            if(intervals[i] > 2) {
                 movementAmount = intervals[i];
             }
 
             sleepStageEntries.add(new BarEntry(movementAmount,i));
-            if(movementAmount > 1) {
+            if(movementAmount > 2) {
                 if(isSleeping) {
                     phases++;
                     isSleeping = false;
                 }
             } else {
                 if(!isSleeping) {
-                    phases++;
                     isSleeping = true;
                 }
             }
@@ -181,27 +180,27 @@ public class SingleNight extends AppCompatActivity {
         // If one hour of the sleep was during daylight consider the light quality bad
         if(dayLight >= 36000) {
             qualityLight = -1;
-        } else if(dawnLight >= 36000) {
+        } else if(dawnLight+dayLight >= 54000) {
             // If one hour of the sleep was during dawn, consider the light quality medium
             qualityLight = 0;
         }
 
         int qualityPhases = 1;
         // Too much phases are no good sign
-        if(phases > 10) {
+        if(phases > 10 || phases < 4) {
             qualityPhases = 0;
         }
 
         int qualitySleep = -1;
-        if(parts.length >= 0.1 * 60*60*7.5) {
-            // At least 7.5 hours of sleep
+        if(parts.length >= 0.1 * 60*60*7) {
+            // At least 7 hours of sleep
             qualitySleep = 1;
-        } else if(parts.length >= 0.1 * 60*60*6.5) {
-            // At least 6.5 hours of sleep
+        } else if(parts.length >= 0.1 * 60*60*5.5) {
+            // At least 5.5 hours of sleep
             qualitySleep = 0;
         }
 
-        int averageQuality = Math.round((qualityLight + qualityPhases + qualitySleep) / 3f);
+        int averageQuality = (int)((qualityPhases + qualitySleep + qualityLight) / 3f);
         TextView qualityIndicator = (TextView)findViewById(R.id.qualityindicator);
         switch (averageQuality) {
             case -1:

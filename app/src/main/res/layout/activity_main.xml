@@ -8,17 +8,6 @@
     tools:context=".MainActivity">
 
 
-    <android.support.design.widget.FloatingActionButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/toggleRecording"
-        android:layout_marginTop="90dp"
-        android:src="@drawable/ic_action_play"
-        android:elevation="15dp"
-        android:backgroundTint="#EDC55B"
-        app:borderWidth="0dp"
-        android:layout_centerHorizontal="true" />
-
     <RelativeLayout
         android:id="@+id/header"
         android:layout_width="fill_parent"
@@ -26,7 +15,6 @@
         android:background="@drawable/swirl_background"
         android:paddingTop="@dimen/activity_vertical_margin"
         android:elevation="5dp">
-
 
         <TextView
             android:id="@+id/title"
@@ -44,6 +32,8 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true" />
+
+
     </RelativeLayout>
     <ListView
         android:layout_alignLeft="@+id/header"
@@ -54,4 +44,16 @@
         android:id="@+id/nights_list"
         android:layout_alignParentStart="false"></ListView>
 
+
+    <android.support.design.widget.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/toggleRecording"
+        android:layout_marginTop="90dp"
+        android:src="@drawable/ic_action_play"
+        app:elevation="15dp"
+        app:backgroundTint="#EDC55B"
+        app:borderWidth="0dp"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentTop="true"/>
 </RelativeLayout>

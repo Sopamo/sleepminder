@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "de.sopamo.uni.sleepminder"
-        minSdkVersion 14
+        minSdkVersion 10
         targetSdkVersion 21
         versionCode 1
         versionName "1.0"
@@ -15,6 +15,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            zipAlignEnabled true
         }
     }
 }

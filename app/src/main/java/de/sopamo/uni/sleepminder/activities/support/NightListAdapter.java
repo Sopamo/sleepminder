@@ -1,6 +1,7 @@
 package de.sopamo.uni.sleepminder.activities.support;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
